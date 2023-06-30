@@ -1,0 +1,16 @@
+version: '3.6'
+services:
+
+  apigw:
+    container_name: apigw
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile.gw.dev
+    ports:
+      - "1323:1323"
+    tty: true
+    restart: always
+
+networks:
+  default:
+    driver: bridge
