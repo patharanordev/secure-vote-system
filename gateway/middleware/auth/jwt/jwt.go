@@ -28,17 +28,7 @@ func IsAuth(next echo.HandlerFunc) echo.HandlerFunc {
 			return []byte("secret"), nil
 		}, jwt.WithLeeway(5*time.Second))
 
-		if token.Valid {
-			claims, ok := token.Claims.(*JwtCustomClaims)
-			if ok {
-				fmt.Printf("Name: %v\n", claims.Name)
-				fmt.Printf("Admin: %v\n", claims.Admin)
-				fmt.Printf("Issuer: %v\n", claims.Issuer)
-			} else {
-				fmt.Printf("Is Claims: %v\n", ok)
-			}
-
-		} else {
+		if !token.Valid {
 			// Just logging to our system...
 			if errors.Is(err, jwt.ErrTokenMalformed) {
 				fmt.Println("That's not even a token")
@@ -55,6 +45,18 @@ func IsAuth(next echo.HandlerFunc) echo.HandlerFunc {
 			return c.String(http.StatusUnauthorized, "Unauthorized")
 		}
 
+		claims, ok := token.Claims.(*JwtCustomClaims)
+		if !ok {
+			fmt.Printf("Is Claims: %v\n", ok)
+			return c.String(http.StatusUnauthorized, "Unauthorized")
+		}
+
+		fmt.Printf("Name: %v\n", claims.Name)
+		fmt.Printf("Admin: %v\n", claims.Admin)
+		fmt.Printf("Issuer: %v\n", claims.Issuer)
+
+		c.Response().Header().Set("x-user-id", claims.ID)
+
 		return next(c)
 	}
 }
@@ -63,15 +65,17 @@ func Login(c echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
 
+	userAccount, errAccount := getUser(username, password)
 	// Throws unauthorized error
-	if username != "jon" || password != "shhh!" {
-		return echo.ErrUnauthorized
+	if errAccount != nil {
+		return c.String(http.StatusUnauthorized, "Unauthorized")
 	}
 
 	// Set custom claims
 	claims := &JwtCustomClaims{
-		"Jon Snow",
-		true,
+		userAccount.ID,
+		userAccount.Name,
+		userAccount.Admin,
 		jwt.RegisteredClaims{
 			// A usual scenario is to set the expiration time relative to the current time
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
@@ -96,4 +100,19 @@ func Login(c echo.Context) error {
 	return c.JSON(http.StatusOK, echo.Map{
 		"token": t,
 	})
+}
+
+func getUser(username string, password string) (*UserAccount, error) {
+
+	// TODO: Get user from storage
+
+	if username != "jon" || password != "shhh!" {
+		return nil, errors.New("Unauthorized")
+	}
+
+	return &UserAccount{
+		"07cc32b5-4e73-4a2e-bab5-8de399a41df5",
+		"Jon Snow",
+		true,
+	}, nil
 }
