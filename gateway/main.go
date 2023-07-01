@@ -27,6 +27,7 @@ func restricted(c echo.Context) error {
 
 func main() {
 	e := echo.New()
+	serviceAuth := auth.ServiceAuth()
 
 	// Middleware
 	e.Use(middleware.Logger())
@@ -36,12 +37,12 @@ func main() {
 	e.Use(ServerHeader)
 
 	// Routes
-	e.POST("/login", auth.Login)
+	e.POST("/login", serviceAuth.Login)
 	e.GET("/health", healthcheck)
 
 	secGroup := e.Group("/api")
 	{
-		secGroup.Use(auth.IsAuth)
+		secGroup.Use(serviceAuth.IsAuth)
 		secGroup.GET("/v1/votes", restricted)
 	}
 
