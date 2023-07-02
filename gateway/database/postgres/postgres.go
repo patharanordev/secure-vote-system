@@ -37,25 +37,44 @@ func (p *PGProps) Connect() (*sql.DB, error) {
 	return db, err
 }
 
-func (p *PGProps) CreateAccount(usr string, pwd string) ([]uint8, error) {
+func (p *PGProps) CreateAccount(usr string, pwd string, isAdmin bool) ([]uint8, error) {
 	fmt.Println("Creating account...")
 
 	var lastInsertId []uint8
 	err := p.db.QueryRow(
-		"INSERT INTO user_info(username, password) VALUES( $1, crypt($2, gen_salt('bf')) ) returning uid;",
-		usr, pwd,
+		"INSERT INTO user_info(username, password, is_admin) VALUES( $1, crypt($2, gen_salt('bf')), $3 ) returning uid;",
+		usr, pwd, isAdmin,
 	).Scan(&lastInsertId)
 
 	return lastInsertId, err
 }
 
-func (p *PGProps) GetAccount(usr string) AccountProps {
+func (p *PGProps) GetAccount(usr string, pwd string) (*AccountProps, error) {
 
-	// TODO: Adding select data
-	// rows, err := db.Query("SELECT * FROM user_info")
-	// if err != nil
+	rows, err := p.db.Query("SELECT uid, username, password, is_admin FROM user_info")
+	if err != nil {
+		return nil, err
+	}
 
-	return AccountProps{}
+	defer rows.Close()
+	accounts := []AccountProps{}
+	for rows.Next() {
+		var account AccountProps
+		if errScan := rows.Scan(
+			&account.UID,
+			&account.Info.Username,
+			&account.Info.Password,
+			&account.Info.IsAdmin,
+		); errScan != nil {
+			return nil, errScan
+		}
+
+		accounts = append(accounts, account)
+	}
+
+	account := accounts[0]
+
+	return &account, nil
 }
 
 func (p *PGProps) UpdateAccount(usr string, pwd string, props AccountInfoProps) error {

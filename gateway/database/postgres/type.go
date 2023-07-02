@@ -5,12 +5,13 @@ import (
 )
 
 type AccountInfoProps struct {
+	Username string
 	Password string
 	IsAdmin  bool
 }
 
 type AccountProps struct {
-	User string
+	UID  []uint8
 	Info AccountInfoProps
 }
 
@@ -30,8 +31,8 @@ type PGProps struct {
 type IDatabase interface {
 	Connect() (*sql.DB, error)
 	Close()
-	CreateAccount(usr string, pwd string) ([]uint8, error)
-	GetAccount(usr string) AccountProps
+	CreateAccount(usr string, pwd string, isAdmin bool) ([]uint8, error)
+	GetAccount(usr string, pwd string) (*AccountProps, error)
 	UpdateAccount(usr string, pwd string, props AccountInfoProps) error
 	DeleteAccount(usr string, pwd string) error
 }

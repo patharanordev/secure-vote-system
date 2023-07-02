@@ -40,4 +40,11 @@ type ServiceAuthProps struct {
 type IServiceAuth interface {
 	IsAuth(next echo.HandlerFunc) echo.HandlerFunc
 	Login(c echo.Context) error
+	Signup(c echo.Context) error
+}
+
+type CreateUserPayload struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	IsAdmin  bool   `json:"isAdmin"`
 }

@@ -1,18 +1,23 @@
 package auth
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
+	database "gateway/database/postgres"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
-func ServiceAuth(db *sql.DB) IServiceAuth {
+var (
+	serviceDB database.IDatabase
+)
+
+func ServiceAuth() IServiceAuth {
 	// Initial
 	s := &ServiceAuthProps{}
 	s.ReqHeader.Authorization = "Authorization"
@@ -20,8 +25,16 @@ func ServiceAuth(db *sql.DB) IServiceAuth {
 	s.JwtSecret = "secret"
 	s.AuthType = "Bearer"
 	s.ResMsg.Unauthorized = "Unauthorized"
-	s.DB = db
 
+	dbConn := database.PGConnProps{
+		DB_HOST:     "db",
+		DB_PORT:     "5432",
+		DB_USER:     "postgres",
+		DB_PASSWORD: "postgres",
+		DB_NAME:     "user_info",
+	}
+
+	serviceDB = database.Initial(dbConn)
 	return s
 }
 
@@ -76,6 +89,29 @@ func (s *ServiceAuthProps) IsAuth(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
+func (s *ServiceAuthProps) getUser(username string, password string) (*UserAccount, error) {
+
+	_, errDB := serviceDB.Connect()
+
+	if errDB != nil {
+		fmt.Printf("Connect to database error : %s\n", errDB.Error())
+		return nil, errDB
+	}
+
+	account, errAccount := serviceDB.GetAccount(username, password)
+	serviceDB.Close()
+
+	if errAccount != nil {
+		return nil, errAccount
+	}
+
+	return &UserAccount{
+		string(account.UID),
+		account.Info.Username,
+		account.Info.IsAdmin,
+	}, nil
+}
+
 func (s *ServiceAuthProps) Login(c echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
@@ -83,6 +119,7 @@ func (s *ServiceAuthProps) Login(c echo.Context) error {
 	userAccount, errAccount := s.getUser(username, password)
 	// Throws unauthorized error
 	if errAccount != nil {
+		fmt.Printf("Login error : %s\n", errAccount.Error())
 		return c.String(http.StatusUnauthorized, s.ResMsg.Unauthorized)
 	}
 
@@ -118,17 +155,39 @@ func (s *ServiceAuthProps) Login(c echo.Context) error {
 	})
 }
 
-func (s *ServiceAuthProps) getUser(username string, password string) (*UserAccount, error) {
-
-	// TODO: Get user from storage
-
-	if username != "jon" || password != "shhh!" {
-		return nil, errors.New(s.ResMsg.Unauthorized)
+func (s *ServiceAuthProps) Signup(c echo.Context) error {
+	payload := new(CreateUserPayload)
+	if err := c.Bind(payload); err != nil {
+		return c.String(http.StatusBadRequest, "Your payload should contains 'username', 'password' and 'isAdmin'.")
 	}
 
-	return &UserAccount{
-		"07cc32b5-4e73-4a2e-bab5-8de399a41df5",
-		"Jon Snow",
-		true,
-	}, nil
+	fmt.Printf("Received payload : %v\n", payload)
+
+	_, errDB := serviceDB.Connect()
+
+	if errDB != nil {
+		fmt.Printf("Connect to database error : %s\n", errDB.Error())
+		return errDB
+	}
+
+	lastInsertId, errInserted := serviceDB.CreateAccount(payload.Username, payload.Password, payload.IsAdmin)
+	serviceDB.Close()
+
+	if errInserted != nil {
+		errInsertedMsg := errInserted.Error()
+		reason := errInsertedMsg
+
+		fmt.Printf("Insert to database error : %s", errInsertedMsg)
+		if strings.Contains(errInsertedMsg, "duplicate key") {
+			reason = "The user name already exists."
+		} else {
+			reason = "Cannot create the account."
+		}
+
+		return c.String(http.StatusBadRequest, reason)
+	}
+
+	fmt.Println("Created, last inserted id : ", lastInsertId)
+
+	return c.String(http.StatusCreated, "Account created.")
 }
