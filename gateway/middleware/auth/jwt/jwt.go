@@ -11,34 +11,37 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func IsAuth(next echo.HandlerFunc) echo.HandlerFunc {
+func ServiceAuth() IServiceAuth {
+	// Initial
+	s := &ServiceAuthProps{}
+	s.ReqHeader.Authorization = "Authorization"
+	s.ReqHeader.UserID = "x-user-id"
+	s.JwtSecret = "secret"
+	s.AuthType = "Bearer"
+	s.ResMsg.Unauthorized = "Unauthorized"
+
+	return s
+}
+
+func (s *ServiceAuthProps) IsAuth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
 		req := c.Request()
 		headers := req.Header
+		AuthTypePrefix := fmt.Sprintf("%s ", s.AuthType)
 
-		bearerToken := headers.Get("Authorization")
-		if !strings.HasPrefix(bearerToken, "Bearer") {
-			return c.String(http.StatusUnauthorized, "Unauthorized")
+		bearerToken := headers.Get(s.ReqHeader.Authorization)
+		if !strings.HasPrefix(bearerToken, s.AuthType) {
+			return c.String(http.StatusUnauthorized, s.ResMsg.Unauthorized)
 		}
-		tokenString := strings.TrimPrefix(bearerToken, "Bearer ")
+		tokenString := strings.TrimPrefix(bearerToken, AuthTypePrefix)
 
 		fmt.Printf("tokenString: %s\n", tokenString)
 		token, err := jwt.ParseWithClaims(tokenString, &JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
-			return []byte("secret"), nil
+			return []byte(s.JwtSecret), nil
 		}, jwt.WithLeeway(5*time.Second))
 
-		if token.Valid {
-			claims, ok := token.Claims.(*JwtCustomClaims)
-			if ok {
-				fmt.Printf("Name: %v\n", claims.Name)
-				fmt.Printf("Admin: %v\n", claims.Admin)
-				fmt.Printf("Issuer: %v\n", claims.Issuer)
-			} else {
-				fmt.Printf("Is Claims: %v\n", ok)
-			}
-
-		} else {
+		if !token.Valid {
 			// Just logging to our system...
 			if errors.Is(err, jwt.ErrTokenMalformed) {
 				fmt.Println("That's not even a token")
@@ -52,35 +55,50 @@ func IsAuth(next echo.HandlerFunc) echo.HandlerFunc {
 				fmt.Println("Couldn't handle this token:", err)
 			}
 
-			return c.String(http.StatusUnauthorized, "Unauthorized")
+			return c.String(http.StatusUnauthorized, s.ResMsg.Unauthorized)
 		}
+
+		claims, ok := token.Claims.(*JwtCustomClaims)
+		if !ok {
+			fmt.Printf("Is Claims: %v\n", ok)
+			return c.String(http.StatusUnauthorized, s.ResMsg.Unauthorized)
+		}
+
+		fmt.Printf(" - Name: %v\n", claims.Name)
+		fmt.Printf(" - Admin: %v\n", claims.Admin)
+		fmt.Printf(" - Issuer: %v\n", claims.Issuer)
+
+		c.Response().Header().Set(s.ReqHeader.UserID, claims.ID)
 
 		return next(c)
 	}
 }
 
-func Login(c echo.Context) error {
+func (s *ServiceAuthProps) Login(c echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
 
+	userAccount, errAccount := s.getUser(username, password)
 	// Throws unauthorized error
-	if username != "jon" || password != "shhh!" {
-		return echo.ErrUnauthorized
+	if errAccount != nil {
+		return c.String(http.StatusUnauthorized, s.ResMsg.Unauthorized)
 	}
 
 	// Set custom claims
+	// Ref. https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.1
 	claims := &JwtCustomClaims{
-		"Jon Snow",
-		true,
+		userAccount.ID,
+		userAccount.Name,
+		userAccount.Admin,
 		jwt.RegisteredClaims{
 			// A usual scenario is to set the expiration time relative to the current time
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
-			Issuer:    "test",
-			Subject:   "somebody",
+			Issuer:    "SecVoteSys",
+			Subject:   "SecVoteSys_CustomAuth",
 			ID:        "1",
-			Audience:  []string{"somebody_else"},
+			Audience:  []string{"general_user"},
 		},
 	}
 
@@ -88,7 +106,7 @@ func Login(c echo.Context) error {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Generate encoded token and send it as response.
-	t, err := token.SignedString([]byte("secret"))
+	t, err := token.SignedString([]byte(s.JwtSecret))
 	if err != nil {
 		return err
 	}
@@ -96,4 +114,19 @@ func Login(c echo.Context) error {
 	return c.JSON(http.StatusOK, echo.Map{
 		"token": t,
 	})
+}
+
+func (s *ServiceAuthProps) getUser(username string, password string) (*UserAccount, error) {
+
+	// TODO: Get user from storage
+
+	if username != "jon" || password != "shhh!" {
+		return nil, errors.New(s.ResMsg.Unauthorized)
+	}
+
+	return &UserAccount{
+		"07cc32b5-4e73-4a2e-bab5-8de399a41df5",
+		"Jon Snow",
+		true,
+	}, nil
 }
