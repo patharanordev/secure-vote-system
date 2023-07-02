@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"database/sql"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
@@ -32,6 +34,7 @@ type ServiceAuthProps struct {
 	AuthType  string
 	ReqHeader RequestHeaderProps
 	ResMsg    ResponseMessageProps
+	DB        *sql.DB
 }
 
 type IServiceAuth interface {

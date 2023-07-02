@@ -1,12 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
+	database "gateway/database/postgres"
 	auth "gateway/middleware/auth/jwt"
+)
+
+var (
+	serviceDB database.IDatabase
 )
 
 // Custom header
@@ -27,23 +33,38 @@ func restricted(c echo.Context) error {
 
 func main() {
 	e := echo.New()
-	serviceAuth := auth.ServiceAuth()
+	dbConn := database.PGConnProps{
+		DB_HOST:     "db",
+		DB_PORT:     "5432",
+		DB_USER:     "postgres",
+		DB_PASSWORD: "postgres",
+		DB_NAME:     "user_info",
+	}
 
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	// Server header
-	e.Use(ServerHeader)
+	serviceDB = database.Initial(dbConn)
+	db, errDB := serviceDB.Connect()
 
-	// Routes
-	e.POST("/login", serviceAuth.Login)
-	e.GET("/health", healthcheck)
+	if errDB != nil {
+		fmt.Printf("Connect to database error : %s\n", errDB.Error())
+	} else {
+		serviceAuth := auth.ServiceAuth(db)
+		// Server header
+		e.Use(ServerHeader)
 
-	secGroup := e.Group("/api")
-	{
-		secGroup.Use(serviceAuth.IsAuth)
-		secGroup.GET("/v1/votes", restricted)
+		// Routes
+		e.POST("/signup", Signup)
+		e.POST("/login", serviceAuth.Login)
+		e.GET("/health", healthcheck)
+
+		secGroup := e.Group("/api")
+		{
+			secGroup.Use(serviceAuth.IsAuth)
+			secGroup.GET("/v1/votes", restricted)
+		}
 	}
 
 	e.Logger.Fatal(e.Start(":1323"))

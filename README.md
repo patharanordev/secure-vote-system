@@ -1,8 +1,16 @@
-# Secure Voting System
+# **Secure Voting System**
 
-## Usage
+## **Features**
 
-### Start services
+- API Gateway
+- Authentication System
+- [Database](./docs/database.md)
+- Voting APIs
+- Web Application
+
+## **Usage**
+
+### **Start services**
 
 The service, including :
 
@@ -15,7 +23,7 @@ docker-compose -f docker-compose.dev.yml down -v && \
 docker-compose -f docker-compose.dev.yml up --build
 ```
 
-### Login
+### **Login**
 
 Let's login first :
 
@@ -33,7 +41,27 @@ Response :
 }
 ```
 
-### Calling APIs
+### **Calling APIs**
+
+***Ex. Create user or Sign-up***
+
+```sh
+curl --location 'http://localhost:1323/signup' \
+--header 'Content-Type: application/json' \
+--data '{
+    "username": "PatharaNor",
+    "password": "1234567890",
+    "isAdmin": true
+}'
+```
+
+Response :
+
+```text
+Account created.
+```
+
+![create-user](assets/create-user.png)
 
 ***Ex. Voting list***
 

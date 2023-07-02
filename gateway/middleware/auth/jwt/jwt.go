@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
@@ -11,7 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func ServiceAuth() IServiceAuth {
+func ServiceAuth(db *sql.DB) IServiceAuth {
 	// Initial
 	s := &ServiceAuthProps{}
 	s.ReqHeader.Authorization = "Authorization"
@@ -19,6 +20,7 @@ func ServiceAuth() IServiceAuth {
 	s.JwtSecret = "secret"
 	s.AuthType = "Bearer"
 	s.ResMsg.Unauthorized = "Unauthorized"
+	s.DB = db
 
 	return s
 }
