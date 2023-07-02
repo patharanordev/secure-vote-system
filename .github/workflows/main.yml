@@ -11,9 +11,14 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
+        with:
+          path: "secure-vote-system"
+
       - name: Deploy Application & Services 
         run: |
-          docker-compose -f ./docker-compose.dev.yml up -d 
+          echo ---Building and starting up docker---
+          docker-compose -f ./secure-vote-system/docker-compose.dev.yml up -d
+          echo ---Containers up---
 #   build:
 #     # The type of runner that the job will run on
 #     runs-on: ubuntu-latest
