@@ -3,9 +3,9 @@ name: CI-dev-pipeline
 on:
   # Triggers the workflow on push or pull request events but only for the develop branch
   push:
-    branches: [ feature/auth ]
+    branches: [ develop ]
   pull_request:
-    branches: [ feature/auth ]
+    branches: [ develop ]
 jobs:
   build:
     # The type of runner that the job will run on
