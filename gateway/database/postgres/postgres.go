@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	_ "github.com/lib/pq"
@@ -41,9 +42,11 @@ func (p *PGProps) CreateAccount(usr string, pwd string, isAdmin bool) ([]uint8, 
 	fmt.Println("Creating account...")
 
 	var lastInsertId []uint8
-	err := p.db.QueryRow(
-		"INSERT INTO user_info(username, password, is_admin) VALUES( $1, crypt($2, gen_salt('bf')), $3 ) returning uid;",
-		usr, pwd, isAdmin,
+	err := p.db.QueryRow(`
+		INSERT INTO user_info(username, password, is_admin) 
+		VALUES( $1, crypt($2, gen_salt('bf')), $3 ) 
+		returning uid;
+		`, usr, pwd, isAdmin,
 	).Scan(&lastInsertId)
 
 	return lastInsertId, err
@@ -51,7 +54,53 @@ func (p *PGProps) CreateAccount(usr string, pwd string, isAdmin bool) ([]uint8, 
 
 func (p *PGProps) GetAccount(usr string, pwd string) (*AccountProps, error) {
 
-	rows, err := p.db.Query("SELECT uid, username, password, is_admin FROM user_info")
+	var account AccountProps
+
+	qStr := fmt.Sprintf(`
+		SELECT uid, username, password, is_admin 
+		FROM user_info 
+		WHERE username = '%s' 
+		AND password = crypt('%s', password)
+		`, usr, pwd,
+	)
+
+	rows, err := p.db.Query(qStr)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+	accounts := []AccountProps{}
+	for rows.Next() {
+		var aProps AccountProps
+		if errScan := rows.Scan(
+			&aProps.UID,
+			&aProps.Info.Username,
+			&aProps.Info.Password,
+			&aProps.Info.IsAdmin,
+		); errScan != nil {
+			return nil, errScan
+		}
+
+		accounts = append(accounts, aProps)
+	}
+
+	if len(accounts) <= 0 {
+		return nil, errors.New("Unauthorized")
+	}
+
+	account = accounts[0]
+	return &account, nil
+}
+
+func (p *PGProps) GetAccountByID(uid string) (*AccountProps, error) {
+
+	qStr := fmt.Sprintf(`
+		SELECT uid, username, password, is_admin 
+		FROM user_info 
+		WHERE uid = '%s'`, uid)
+
+	rows, err := p.db.Query(qStr)
 	if err != nil {
 		return nil, err
 	}

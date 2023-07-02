@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 	auth "gateway/middleware/auth/jwt"
+	res "gateway/response"
 )
 
 // Custom header
@@ -22,7 +23,11 @@ func healthcheck(c echo.Context) error {
 }
 
 func restricted(c echo.Context) error {
-	return c.String(http.StatusOK, "Vote list")
+	return c.JSON(http.StatusOK, &res.ResponseObject{
+		Status: http.StatusOK,
+		Data:   &res.VotingInfos{Votes: []string{"a"}},
+		Error:  nil,
+	})
 }
 
 func main() {

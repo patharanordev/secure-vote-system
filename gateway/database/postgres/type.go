@@ -33,6 +33,7 @@ type IDatabase interface {
 	Close()
 	CreateAccount(usr string, pwd string, isAdmin bool) ([]uint8, error)
 	GetAccount(usr string, pwd string) (*AccountProps, error)
+	GetAccountByID(uid string) (*AccountProps, error)
 	UpdateAccount(usr string, pwd string, props AccountInfoProps) error
 	DeleteAccount(usr string, pwd string) error
 }
