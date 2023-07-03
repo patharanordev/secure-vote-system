@@ -7,8 +7,15 @@ import (
 	"strings"
 	"time"
 
+	database "gateway/database/postgres"
+	res "gateway/response"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
+)
+
+var (
+	serviceDB database.IDatabase
 )
 
 func ServiceAuth() IServiceAuth {
@@ -20,6 +27,15 @@ func ServiceAuth() IServiceAuth {
 	s.AuthType = "Bearer"
 	s.ResMsg.Unauthorized = "Unauthorized"
 
+	dbConn := database.PGConnProps{
+		DB_HOST:     "db",
+		DB_PORT:     "5432",
+		DB_USER:     "postgres",
+		DB_PASSWORD: "postgres",
+		DB_NAME:     "user_info",
+	}
+
+	serviceDB = database.Initial(dbConn)
 	return s
 }
 
@@ -32,7 +48,11 @@ func (s *ServiceAuthProps) IsAuth(next echo.HandlerFunc) echo.HandlerFunc {
 
 		bearerToken := headers.Get(s.ReqHeader.Authorization)
 		if !strings.HasPrefix(bearerToken, s.AuthType) {
-			return c.String(http.StatusUnauthorized, s.ResMsg.Unauthorized)
+			return c.JSON(http.StatusUnauthorized, &res.ResponseObject{
+				Status: http.StatusUnauthorized,
+				Data:   nil,
+				Error:  &s.ResMsg.Unauthorized,
+			})
 		}
 		tokenString := strings.TrimPrefix(bearerToken, AuthTypePrefix)
 
@@ -42,36 +62,105 @@ func (s *ServiceAuthProps) IsAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		}, jwt.WithLeeway(5*time.Second))
 
 		if !token.Valid {
+			errMsg := ""
 			// Just logging to our system...
 			if errors.Is(err, jwt.ErrTokenMalformed) {
-				fmt.Println("That's not even a token")
+				errMsg = fmt.Sprint("That's not even a token")
 			} else if errors.Is(err, jwt.ErrTokenSignatureInvalid) {
 				// Invalid signature
-				fmt.Println("Invalid signature")
+				errMsg = fmt.Sprint("Invalid signature")
 			} else if errors.Is(err, jwt.ErrTokenExpired) || errors.Is(err, jwt.ErrTokenNotValidYet) {
 				// Token is either expired or not active yet
-				fmt.Println("Timing is everything")
+				errMsg = fmt.Sprint("Timing is everything")
 			} else {
-				fmt.Println("Couldn't handle this token:", err)
+				errMsg = fmt.Sprint("Couldn't handle this token:", err)
 			}
 
-			return c.String(http.StatusUnauthorized, s.ResMsg.Unauthorized)
+			fmt.Printf("Token invalid : %s\n", errMsg)
+
+			return c.JSON(http.StatusUnauthorized, &res.ResponseObject{
+				Status: http.StatusUnauthorized,
+				Data:   nil,
+				Error:  &errMsg,
+			})
 		}
 
 		claims, ok := token.Claims.(*JwtCustomClaims)
 		if !ok {
-			fmt.Printf("Is Claims: %v\n", ok)
-			return c.String(http.StatusUnauthorized, s.ResMsg.Unauthorized)
+			errMsg := fmt.Sprint("Cannot claims")
+			return c.JSON(http.StatusUnauthorized, &res.ResponseObject{
+				Status: http.StatusUnauthorized,
+				Data:   nil,
+				Error:  &errMsg,
+			})
 		}
 
+		fmt.Printf(" - ID: %v\n", claims.ID)
 		fmt.Printf(" - Name: %v\n", claims.Name)
 		fmt.Printf(" - Admin: %v\n", claims.Admin)
 		fmt.Printf(" - Issuer: %v\n", claims.Issuer)
 
-		c.Response().Header().Set(s.ReqHeader.UserID, claims.ID)
+		account, errAccount := s.getUserByID(claims.ID)
+
+		if errAccount != nil {
+			errMsg := errAccount.Error()
+			return c.JSON(http.StatusUnauthorized, &res.ResponseObject{
+				Status: http.StatusUnauthorized,
+				Data:   nil,
+				Error:  &errMsg,
+			})
+		}
+
+		c.Request().Header.Set(s.ReqHeader.UserID, account.ID)
 
 		return next(c)
 	}
+}
+
+func (s *ServiceAuthProps) getUser(username string, password string) (*UserAccount, error) {
+
+	_, errDB := serviceDB.Connect()
+
+	if errDB != nil {
+		fmt.Printf("Connect to database error : %s\n", errDB.Error())
+		return nil, errDB
+	}
+
+	account, errAccount := serviceDB.GetAccount(username, password)
+	serviceDB.Close()
+
+	if errAccount != nil {
+		return nil, errAccount
+	}
+
+	return &UserAccount{
+		string(account.UID),
+		account.Info.Username,
+		account.Info.IsAdmin,
+	}, nil
+}
+
+func (s *ServiceAuthProps) getUserByID(uid string) (*UserAccount, error) {
+
+	_, errDB := serviceDB.Connect()
+
+	if errDB != nil {
+		fmt.Printf("Connect to database error : %s\n", errDB.Error())
+		return nil, errDB
+	}
+
+	account, errAccount := serviceDB.GetAccountByID(uid)
+	serviceDB.Close()
+
+	if errAccount != nil {
+		return nil, errAccount
+	}
+
+	return &UserAccount{
+		string(account.UID),
+		account.Info.Username,
+		account.Info.IsAdmin,
+	}, nil
 }
 
 func (s *ServiceAuthProps) Login(c echo.Context) error {
@@ -81,7 +170,12 @@ func (s *ServiceAuthProps) Login(c echo.Context) error {
 	userAccount, errAccount := s.getUser(username, password)
 	// Throws unauthorized error
 	if errAccount != nil {
-		return c.String(http.StatusUnauthorized, s.ResMsg.Unauthorized)
+		errMsg := errAccount.Error()
+		return c.JSON(http.StatusUnauthorized, &res.ResponseObject{
+			Status: http.StatusUnauthorized,
+			Data:   nil,
+			Error:  &errMsg,
+		})
 	}
 
 	// Set custom claims
@@ -116,17 +210,128 @@ func (s *ServiceAuthProps) Login(c echo.Context) error {
 	})
 }
 
-func (s *ServiceAuthProps) getUser(username string, password string) (*UserAccount, error) {
-
-	// TODO: Get user from storage
-
-	if username != "jon" || password != "shhh!" {
-		return nil, errors.New(s.ResMsg.Unauthorized)
+func (s *ServiceAuthProps) Signup(c echo.Context) error {
+	payload := new(CreateUserPayload)
+	if err := c.Bind(payload); err != nil {
+		errMsg := "Your payload should contains 'username', 'password' and 'isAdmin'."
+		return c.JSON(http.StatusBadRequest, &res.ResponseObject{
+			Status: http.StatusBadRequest,
+			Data:   nil,
+			Error:  &errMsg,
+		})
 	}
 
-	return &UserAccount{
-		"07cc32b5-4e73-4a2e-bab5-8de399a41df5",
-		"Jon Snow",
-		true,
-	}, nil
+	fmt.Printf("Received payload : %v\n", payload)
+
+	_, errDB := serviceDB.Connect()
+
+	if errDB != nil {
+		fmt.Printf("Connect to database error : %s\n", errDB.Error())
+		return errDB
+	}
+
+	lastInsertId, errInserted := serviceDB.CreateAccount(payload.Username, payload.Password, payload.IsAdmin)
+	serviceDB.Close()
+
+	if errInserted != nil {
+		errInsertedMsg := errInserted.Error()
+		reason := errInsertedMsg
+
+		fmt.Printf("Insert to database error : %s", errInsertedMsg)
+		if strings.Contains(errInsertedMsg, "duplicate key") {
+			reason = "The user name already exists."
+		} else {
+			reason = "Cannot create the account."
+		}
+
+		return c.JSON(http.StatusBadRequest, &res.ResponseObject{
+			Status: http.StatusBadRequest,
+			Data:   nil,
+			Error:  &reason,
+		})
+	}
+
+	fmt.Println("Created, last inserted id : ", lastInsertId)
+
+	return c.JSON(http.StatusCreated, &res.ResponseObject{
+		Status: http.StatusCreated,
+		Data:   "Account created.",
+		Error:  nil,
+	})
+}
+
+func (s *ServiceAuthProps) UpdateAccount(c echo.Context) error {
+	payload := new(UpdateAccountPayload)
+	uid := c.Request().Header.Get(s.ReqHeader.UserID)
+	fmt.Printf("User ID : %v\n", uid)
+
+	if err := c.Bind(payload); err != nil {
+		errMsg := "Your payload should contains 'username' and 'isAdmin'."
+		return c.JSON(http.StatusBadRequest, &res.ResponseObject{
+			Status: http.StatusBadRequest,
+			Data:   nil,
+			Error:  &errMsg,
+		})
+	}
+
+	fmt.Printf("Received payload : %v\n", payload)
+
+	_, errDB := serviceDB.Connect()
+
+	if errDB != nil {
+		fmt.Printf("Connect to database error : %s\n", errDB.Error())
+		return errDB
+	}
+
+	errUpdated := serviceDB.UpdateAccount(uid, payload.Username, payload.IsAdmin)
+	serviceDB.Close()
+
+	if errUpdated != nil {
+		errUpdatedMsg := errUpdated.Error()
+		reason := errUpdatedMsg
+
+		return c.JSON(http.StatusBadRequest, &res.ResponseObject{
+			Status: http.StatusBadRequest,
+			Data:   nil,
+			Error:  &reason,
+		})
+	}
+
+	return c.JSON(http.StatusOK, &res.ResponseObject{
+		Status: http.StatusOK,
+		Data:   "Account updated.",
+		Error:  nil,
+	})
+}
+
+func (s *ServiceAuthProps) DeleteAccount(c echo.Context) error {
+	uid := c.Request().Header.Get(s.ReqHeader.UserID)
+	fmt.Printf("User ID : %v\n", uid)
+
+	_, errDB := serviceDB.Connect()
+
+	if errDB != nil {
+		fmt.Printf("Connect to database error : %s\n", errDB.Error())
+		return errDB
+	}
+
+	err := serviceDB.DeleteAccountByID(uid)
+	serviceDB.Close()
+
+	if err != nil {
+		errMsg := err.Error()
+		reason := errMsg
+
+		return c.JSON(http.StatusBadRequest, &res.ResponseObject{
+			Status: http.StatusBadRequest,
+			Data:   nil,
+			Error:  &reason,
+		})
+	}
+
+	return c.JSON(http.StatusOK, &res.ResponseObject{
+		Status: http.StatusOK,
+		Data:   "Account deleted.",
+		Error:  nil,
+	})
 }
