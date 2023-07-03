@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -44,6 +46,7 @@ func deleteAccount(c echo.Context) error {
 
 func main() {
 	e := echo.New()
+	fmt.Printf("Current timestamp : %v", time.Now())
 
 	// Middleware
 	e.Use(middleware.Logger())
