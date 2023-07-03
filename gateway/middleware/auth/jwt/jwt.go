@@ -111,7 +111,7 @@ func (s *ServiceAuthProps) IsAuth(next echo.HandlerFunc) echo.HandlerFunc {
 			})
 		}
 
-		c.Response().Header().Set(s.ReqHeader.UserID, account.ID)
+		c.Request().Header.Set(s.ReqHeader.UserID, account.ID)
 
 		return next(c)
 	}
@@ -256,6 +256,82 @@ func (s *ServiceAuthProps) Signup(c echo.Context) error {
 	return c.JSON(http.StatusCreated, &res.ResponseObject{
 		Status: http.StatusCreated,
 		Data:   "Account created.",
+		Error:  nil,
+	})
+}
+
+func (s *ServiceAuthProps) UpdateAccount(c echo.Context) error {
+	payload := new(UpdateAccountPayload)
+	uid := c.Request().Header.Get(s.ReqHeader.UserID)
+	fmt.Printf("User ID : %v\n", uid)
+
+	if err := c.Bind(payload); err != nil {
+		errMsg := "Your payload should contains 'username' and 'isAdmin'."
+		return c.JSON(http.StatusBadRequest, &res.ResponseObject{
+			Status: http.StatusBadRequest,
+			Data:   nil,
+			Error:  &errMsg,
+		})
+	}
+
+	fmt.Printf("Received payload : %v\n", payload)
+
+	_, errDB := serviceDB.Connect()
+
+	if errDB != nil {
+		fmt.Printf("Connect to database error : %s\n", errDB.Error())
+		return errDB
+	}
+
+	errUpdated := serviceDB.UpdateAccount(uid, payload.Username, payload.IsAdmin)
+	serviceDB.Close()
+
+	if errUpdated != nil {
+		errUpdatedMsg := errUpdated.Error()
+		reason := errUpdatedMsg
+
+		return c.JSON(http.StatusBadRequest, &res.ResponseObject{
+			Status: http.StatusBadRequest,
+			Data:   nil,
+			Error:  &reason,
+		})
+	}
+
+	return c.JSON(http.StatusOK, &res.ResponseObject{
+		Status: http.StatusOK,
+		Data:   "Account updated.",
+		Error:  nil,
+	})
+}
+
+func (s *ServiceAuthProps) DeleteAccount(c echo.Context) error {
+	uid := c.Request().Header.Get(s.ReqHeader.UserID)
+	fmt.Printf("User ID : %v\n", uid)
+
+	_, errDB := serviceDB.Connect()
+
+	if errDB != nil {
+		fmt.Printf("Connect to database error : %s\n", errDB.Error())
+		return errDB
+	}
+
+	err := serviceDB.DeleteAccountByID(uid)
+	serviceDB.Close()
+
+	if err != nil {
+		errMsg := err.Error()
+		reason := errMsg
+
+		return c.JSON(http.StatusBadRequest, &res.ResponseObject{
+			Status: http.StatusBadRequest,
+			Data:   nil,
+			Error:  &reason,
+		})
+	}
+
+	return c.JSON(http.StatusOK, &res.ResponseObject{
+		Status: http.StatusOK,
+		Data:   "Account deleted.",
 		Error:  nil,
 	})
 }

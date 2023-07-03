@@ -86,3 +86,42 @@ Response :
     ```
 
 - body: `Vote list`
+
+***Optional#1 : Edit account***
+
+```sh
+curl --location 'http://localhost:1323/api/v1/account' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZiNGEyNzY5LTRmZjMtNGVjNi1iNTg2LTY2OThjM2ZlNGE5ZCIsIm5hbWUiOiJQYXRoYXJhTm9yIiwiYWRtaW4iOmZhbHNlLCJpc3MiOiJTZWNWb3RlU3lzIiwic3ViIjoiU2VjVm90ZVN5c19DdXN0b21BdXRoIiwiYXVkIjpbImdlbmVyYWxfdXNlciJdLCJleHAiOjE2ODg0ODI1OTYsIm5iZiI6MTY4ODM5NjE5NiwiaWF0IjoxNjg4Mzk2MTk2LCJqdGkiOiIxIn0.uxBd6HSPT2kKRY_u9QZ8GJt2ZtLHV3OpRjWEVFb9A0s' \
+--header 'Content-Type: application/json' \
+--data '{
+    "username": "Bom Ja",
+    "isAdmin": false
+}'
+```
+
+Response :
+
+```json
+{
+    "status": 200,
+    "data": "Account updated.",
+    "error": null
+}
+```
+
+***Optional#2 : Delete account***
+
+```sh
+curl --location --request DELETE 'http://localhost:1323/api/v1/account' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImU3ZTRmMjc3LWEzMjctNGY5Ny04OGUzLTViMzlhMTAzZTAxOSIsIm5hbWUiOiJQYXRoYXJhTm9yMSIsImFkbWluIjpmYWxzZSwiaXNzIjoiU2VjVm90ZVN5cyIsInN1YiI6IlNlY1ZvdGVTeXNfQ3VzdG9tQXV0aCIsImF1ZCI6WyJnZW5lcmFsX3VzZXIiXSwiZXhwIjoxNjg4NDc4NTk2LCJuYmYiOjE2ODgzOTIxOTYsImlhdCI6MTY4ODM5MjE5NiwianRpIjoiMSJ9.kPhnHwj53XWdhoWTNacfU3tId9zu9rKxeZKeSv0E8bo'
+```
+
+Response :
+
+```json
+{
+    "status": 200,
+    "data": "Account deleted.",
+    "error": null
+}
+```

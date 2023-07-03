@@ -10,6 +10,10 @@ import (
 	res "gateway/response"
 )
 
+var (
+	serviceAuth auth.IServiceAuth
+)
+
 // Custom header
 func ServerHeader(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -30,6 +34,14 @@ func restricted(c echo.Context) error {
 	})
 }
 
+func updateAccount(c echo.Context) error {
+	return serviceAuth.UpdateAccount(c)
+}
+
+func deleteAccount(c echo.Context) error {
+	return serviceAuth.DeleteAccount(c)
+}
+
 func main() {
 	e := echo.New()
 
@@ -37,7 +49,7 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	serviceAuth := auth.ServiceAuth()
+	serviceAuth = auth.ServiceAuth()
 	// Server header
 	e.Use(ServerHeader)
 
@@ -50,6 +62,8 @@ func main() {
 	{
 		secGroup.Use(serviceAuth.IsAuth)
 		secGroup.GET("/v1/votes", restricted)
+		secGroup.POST("/v1/account", updateAccount)
+		secGroup.DELETE("/v1/account", deleteAccount)
 	}
 
 	e.Logger.Fatal(e.Start(":1323"))

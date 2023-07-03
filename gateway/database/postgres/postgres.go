@@ -130,17 +130,33 @@ func (p *PGProps) GetAccountByID(uid string) (*AccountProps, error) {
 	return &account, nil
 }
 
-func (p *PGProps) UpdateAccount(usr string, pwd string, props AccountInfoProps) error {
+func (p *PGProps) UpdateAccount(uid string, usr string, isAdmin bool) error {
 
-	// TODO: Update data
-	// stmt, err := db.Prepare("update user_info set username=$1 where uid=$2")
-	// if err != nil
+	result, err := p.db.Exec(`
+	UPDATE user_info 
+	SET username=$1, is_admin=$2 
+	WHERE uid=$3
+	`, usr, isAdmin, uid)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("update result: %v\n", result)
 
 	return nil
 }
 
-func (p *PGProps) DeleteAccount(usr string, pwd string) error {
-	// TODO: Delete data
+func (p *PGProps) DeleteAccountByID(uid string) error {
+
+	result, err := p.db.Exec(`
+	DELETE FROM user_info 
+	WHERE uid=$1
+	`, uid)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("delete result: %v\n", result)
 
 	return nil
 }

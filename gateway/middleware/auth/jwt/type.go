@@ -41,10 +41,17 @@ type IServiceAuth interface {
 	IsAuth(next echo.HandlerFunc) echo.HandlerFunc
 	Login(c echo.Context) error
 	Signup(c echo.Context) error
+	UpdateAccount(c echo.Context) error
+	DeleteAccount(c echo.Context) error
 }
 
 type CreateUserPayload struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	IsAdmin  bool   `json:"isAdmin"`
+}
+
+type UpdateAccountPayload struct {
+	Username string `json:"username"`
 	IsAdmin  bool   `json:"isAdmin"`
 }
