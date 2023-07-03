@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -134,9 +135,9 @@ func (p *PGProps) UpdateAccount(uid string, usr string, isAdmin bool) error {
 
 	result, err := p.db.Exec(`
 	UPDATE user_info 
-	SET username=$1, is_admin=$2 
-	WHERE uid=$3
-	`, usr, isAdmin, uid)
+	SET username=$1, is_admin=$2, updated_at=$3 
+	WHERE uid=$4
+	`, usr, isAdmin, time.Now(), uid)
 	if err != nil {
 		return err
 	}
