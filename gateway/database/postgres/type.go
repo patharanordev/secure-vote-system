@@ -31,6 +31,7 @@ type PGProps struct {
 type IDatabase interface {
 	Connect() (*sql.DB, error)
 	Close()
+	SetDB(db *sql.DB)
 	CreateAccount(usr string, pwd string, isAdmin bool) ([]uint8, error)
 	GetAccount(usr string, pwd string) (*AccountProps, error)
 	GetAccountByID(uid string) (*AccountProps, error)

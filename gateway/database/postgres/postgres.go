@@ -33,9 +33,13 @@ func (p *PGProps) Connect() (*sql.DB, error) {
 		p.conn.DB_NAME,
 	)
 	db, err := sql.Open("postgres", dbinfo)
-	p.db = db
+	p.SetDB(db)
 
 	return db, err
+}
+
+func (p *PGProps) SetDB(db *sql.DB) {
+	p.db = db
 }
 
 func (p *PGProps) CreateAccount(usr string, pwd string, isAdmin bool) ([]uint8, error) {
