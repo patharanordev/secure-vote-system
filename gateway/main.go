@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -28,10 +29,33 @@ func healthcheck(c echo.Context) error {
 	return c.String(http.StatusOK, "OK")
 }
 
+func handleError(c echo.Context, err error) error {
+	errMsg := err.Error()
+	return c.JSON(http.StatusBadGateway, &res.ResponseObject{
+		Status: http.StatusBadGateway,
+		Data:   nil,
+		Error:  &errMsg,
+	})
+}
+
 func restricted(c echo.Context) error {
+	resp, errRes := http.Get("http://apis:1323/health")
+	if errRes != nil {
+		return handleError(c, errRes)
+	}
+
+	body, errReadBody := ioutil.ReadAll(resp.Body)
+	if errReadBody != nil {
+		handleError(c, errReadBody)
+	}
+
+	//Convert the body to type string
+	sb := string(body)
+	fmt.Printf("Calling internal API: %v\n", sb)
+
 	return c.JSON(http.StatusOK, &res.ResponseObject{
 		Status: http.StatusOK,
-		Data:   &res.VotingInfos{Votes: []string{"a"}},
+		Data:   &sb,
 		Error:  nil,
 	})
 }
