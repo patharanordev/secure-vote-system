@@ -126,8 +126,12 @@ func (p *PGProps) GetAccountByID(uid string) (*AccountProps, error) {
 		accounts = append(accounts, account)
 	}
 
-	account := accounts[0]
+	if len(accounts) <= 0 {
+		errNotFound := errors.New("Account not found.")
+		return nil, errNotFound
+	}
 
+	account := accounts[0]
 	return &account, nil
 }
 

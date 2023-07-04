@@ -4,15 +4,24 @@ import (
 	"database/sql"
 )
 
-type AccountInfoProps struct {
-	Username string
-	Password string
-	IsAdmin  bool
+type VoteItemInfoProps struct {
+	Name        string `json:"itemName" db:"item_name"`
+	Description string `json:"itemDescription" db:"item_description"`
+	VoteCount   int    `json:"voteCount" db:"vote_count"`
 }
 
-type AccountProps struct {
-	UID  []uint8
-	Info AccountInfoProps
+type VoteItemProps struct {
+	VID  []uint8           `json:"vid"`
+	Info VoteItemInfoProps `json:"info"`
+}
+
+type CreateVoteItemPayload struct {
+	Name        string `json:"itemName"`
+	Description string `json:"itemDescription"`
+}
+
+type VoteItemIDPayload struct {
+	VID string `json:"id"`
 }
 
 type PGConnProps struct {
@@ -32,9 +41,14 @@ type IDatabase interface {
 	Connect() (*sql.DB, error)
 	Close()
 	SetDB(db *sql.DB)
-	CreateAccount(usr string, pwd string, isAdmin bool) ([]uint8, error)
-	GetAccount(usr string, pwd string) (*AccountProps, error)
-	GetAccountByID(uid string) (*AccountProps, error)
-	UpdateAccount(uid string, usr string, isAdmin bool) error
-	DeleteAccountByID(uid string) error
+
+	// Vote item
+	CreateVoteItem(payload *CreateVoteItemPayload) ([]uint8, error)
+	GetVoteItemByID(payload *VoteItemIDPayload) (*VoteItemProps, error)
+	UpdateVoteItemByID(item *VoteItemProps) error
+	DeleteVoteItemByID(payload *VoteItemIDPayload) error
+
+	// Vote list
+	GetVoteList() ([]VoteItemProps, error)
+	DeleteVoteList() error
 }

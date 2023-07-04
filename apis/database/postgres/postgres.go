@@ -2,9 +2,7 @@ package database
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
-	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -43,31 +41,28 @@ func (p *PGProps) SetDB(db *sql.DB) {
 	p.db = db
 }
 
-func (p *PGProps) CreateAccount(usr string, pwd string, isAdmin bool) ([]uint8, error) {
-	fmt.Println("Creating account...")
+// -------------------- item --------------------
+
+func (p *PGProps) CreateVoteItem(payload *CreateVoteItemPayload) ([]uint8, error) {
+	fmt.Println("Creating vote item...")
 
 	var lastInsertId []uint8
 	err := p.db.QueryRow(`
-		INSERT INTO user_info(username, password, is_admin) 
-		VALUES( $1, crypt($2, gen_salt('bf')), $3 ) 
-		returning uid;
-		`, usr, pwd, isAdmin,
+		INSERT INTO vote(item_name, item_description) 
+		VALUES( $1, $2 ) 
+		returning vid;
+		`, payload.Name, payload.Description,
 	).Scan(&lastInsertId)
 
 	return lastInsertId, err
 }
 
-func (p *PGProps) GetAccount(usr string, pwd string) (*AccountProps, error) {
-
-	var account AccountProps
+func (p *PGProps) GetVoteItemByID(payload *VoteItemIDPayload) (*VoteItemProps, error) {
 
 	qStr := fmt.Sprintf(`
-		SELECT uid, username, password, is_admin 
-		FROM user_info 
-		WHERE username = '%s' 
-		AND password = crypt('%s', password)
-		`, usr, pwd,
-	)
+		SELECT vid, item_name, item_description, vote_count 
+		FROM vote 
+		WHERE vid = '%s'`, payload.VID)
 
 	rows, err := p.db.Query(qStr)
 	if err != nil {
@@ -75,69 +70,37 @@ func (p *PGProps) GetAccount(usr string, pwd string) (*AccountProps, error) {
 	}
 
 	defer rows.Close()
-	accounts := []AccountProps{}
+	voteItems := []VoteItemProps{}
 	for rows.Next() {
-		var aProps AccountProps
+		var voteItem VoteItemProps
 		if errScan := rows.Scan(
-			&aProps.UID,
-			&aProps.Info.Username,
-			&aProps.Info.Password,
-			&aProps.Info.IsAdmin,
+			&voteItem.VID,
+			&voteItem.Info.Name,
+			&voteItem.Info.Description,
+			&voteItem.Info.VoteCount,
 		); errScan != nil {
 			return nil, errScan
 		}
 
-		accounts = append(accounts, aProps)
+		voteItems = append(voteItems, voteItem)
 	}
 
-	if len(accounts) <= 0 {
-		return nil, errors.New("Unauthorized")
-	}
+	voteItem := voteItems[0]
 
-	account = accounts[0]
-	return &account, nil
+	return &voteItem, nil
 }
 
-func (p *PGProps) GetAccountByID(uid string) (*AccountProps, error) {
-
-	qStr := fmt.Sprintf(`
-		SELECT uid, username, password, is_admin 
-		FROM user_info 
-		WHERE uid = '%s'`, uid)
-
-	rows, err := p.db.Query(qStr)
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-	accounts := []AccountProps{}
-	for rows.Next() {
-		var account AccountProps
-		if errScan := rows.Scan(
-			&account.UID,
-			&account.Info.Username,
-			&account.Info.Password,
-			&account.Info.IsAdmin,
-		); errScan != nil {
-			return nil, errScan
-		}
-
-		accounts = append(accounts, account)
-	}
-
-	account := accounts[0]
-
-	return &account, nil
-}
-
-func (p *PGProps) UpdateAccount(uid string, usr string, isAdmin bool) error {
+func (p *PGProps) UpdateVoteItemByID(item *VoteItemProps) error {
 
 	result, err := p.db.Exec(`
-	UPDATE user_info 
-	SET username=$1, is_admin=$2, updated_at=$3 
-	WHERE uid=$4
-	`, usr, isAdmin, time.Now(), uid)
+	UPDATE vote 
+	SET item_name=$1, item_description=$2, vote_count=$3 
+	WHERE vid=$4
+	`, item.Info.Name,
+		item.Info.Description,
+		item.Info.VoteCount,
+		item.VID,
+	)
 	if err != nil {
 		return err
 	}
@@ -147,12 +110,57 @@ func (p *PGProps) UpdateAccount(uid string, usr string, isAdmin bool) error {
 	return nil
 }
 
-func (p *PGProps) DeleteAccountByID(uid string) error {
+func (p *PGProps) DeleteVoteItemByID(payload *VoteItemIDPayload) error {
 
 	result, err := p.db.Exec(`
-	DELETE FROM user_info 
-	WHERE uid=$1
-	`, uid)
+	DELETE FROM vote 
+	WHERE vid=$1
+	`, payload.VID)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("delete result: %v\n", result)
+
+	return nil
+}
+
+// -------------------- list --------------------
+
+func (p *PGProps) GetVoteList() ([]VoteItemProps, error) {
+
+	qStr := fmt.Sprintf(`
+		SELECT vid, item_name, item_description, vote_count 
+		FROM vote
+	`)
+
+	rows, err := p.db.Query(qStr)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+	voteItems := []VoteItemProps{}
+	for rows.Next() {
+		var voteItem VoteItemProps
+		if errScan := rows.Scan(
+			&voteItem.VID,
+			&voteItem.Info.Name,
+			&voteItem.Info.Description,
+			&voteItem.Info.VoteCount,
+		); errScan != nil {
+			return nil, errScan
+		}
+
+		voteItems = append(voteItems, voteItem)
+	}
+
+	return voteItems, nil
+}
+
+func (p *PGProps) DeleteVoteList() error {
+
+	result, err := p.db.Exec(`DELETE FROM vote`)
 	if err != nil {
 		return err
 	}
