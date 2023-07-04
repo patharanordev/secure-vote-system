@@ -3,7 +3,7 @@
 ## **Features**
 
 - [API Gateway](./docs/gateway.md)
-- Authentication System
+- [Authentication/Authorization](./docs/authorization.md)
 - [Database](./docs/database.md)
 - Voting APIs
 - Web Application
