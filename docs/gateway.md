@@ -9,11 +9,8 @@ The middleware including :
 - JWT Authorization service -- users **MUST** authorized before get info from our APIs.
 - Attached `x-user-id` or user ID into request header before calling our microservices. The ID will be referenced both frontend/backend :
 
-    > **IsAuth** function
-    >
-    > Ref. `gateway/middleware/auth/jwt/jwt.go`
-
     ```go
+    // Ref. `gateway/middleware/auth/jwt/jwt.go`
     c.Request().Header.Set(s.ReqHeader.UserID, account.ID)
     ```
 
