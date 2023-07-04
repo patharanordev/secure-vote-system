@@ -14,8 +14,8 @@
 
 The service, including :
 
-- API Gateway -- available on port `9323`/`1323` (public/private).
-- Voting APIs -- available on port `1323` (private only).
+- API Gateway — available on port `9323`/`1323` (public/private).
+- Voting APIs — available on port `1323` (private only).
 - Web application
 
 ```sh
