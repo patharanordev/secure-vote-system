@@ -43,6 +43,8 @@ services:
     container_name: db
     image: postgres
     environment:
+      TZ: 'GMT+7'
+      PGTZ: 'GMT+7'
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: user_info

@@ -23,6 +23,17 @@ func CreateVoteItem(c echo.Context) error {
 		})
 	}
 
+	errAuth := "Unauthorized"
+	userId := c.Request().Header.Get("x-user-id")
+	fmt.Printf(" - User ID : %s\n", userId)
+	if len(userId) <= 0 {
+		return c.JSON(http.StatusUnauthorized, &res.ResponseObject{
+			Status: http.StatusUnauthorized,
+			Data:   nil,
+			Error:  &errAuth,
+		})
+	}
+
 	fmt.Printf(" - CreateVoteItem Received payload : %v\n", payload)
 
 	_, errDB := serviceDB.Connect()
@@ -32,7 +43,7 @@ func CreateVoteItem(c echo.Context) error {
 		return errDB
 	}
 
-	lastInsertId, errExec := serviceDB.CreateVoteItem(payload)
+	lastInsertId, errExec := serviceDB.CreateVoteItem(userId, payload)
 	serviceDB.Close()
 
 	if errExec != nil {
@@ -63,13 +74,25 @@ func CreateVoteItem(c echo.Context) error {
 }
 
 func UpdateVoteItemByID(c echo.Context) error {
-	payload := new(database.VoteItemProps)
+	payload := new(database.VoteItemPayload)
 	if err := c.Bind(payload); err != nil {
+		fmt.Printf("UpdateVoteItemByID error : %v\n", err.Error())
 		errMsg := "Your payload should contains 'id'."
 		return c.JSON(http.StatusBadRequest, &res.ResponseObject{
 			Status: http.StatusBadRequest,
 			Data:   nil,
 			Error:  &errMsg,
+		})
+	}
+
+	errAuth := "Unauthorized"
+	userId := c.Request().Header.Get("x-user-id")
+	fmt.Printf(" - User ID : %s\n", userId)
+	if len(userId) <= 0 {
+		return c.JSON(http.StatusUnauthorized, &res.ResponseObject{
+			Status: http.StatusUnauthorized,
+			Data:   nil,
+			Error:  &errAuth,
 		})
 	}
 
@@ -82,7 +105,7 @@ func UpdateVoteItemByID(c echo.Context) error {
 		return errDB
 	}
 
-	errExec := serviceDB.UpdateVoteItemByID(payload)
+	errExec := serviceDB.UpdateVoteItemByID(userId, payload)
 	serviceDB.Close()
 
 	if errExec != nil {
@@ -112,6 +135,17 @@ func DeleteVoteItemByID(c echo.Context) error {
 		})
 	}
 
+	errAuth := "Unauthorized"
+	userId := c.Request().Header.Get("x-user-id")
+	fmt.Printf(" - User ID : %s\n", userId)
+	if len(userId) <= 0 {
+		return c.JSON(http.StatusUnauthorized, &res.ResponseObject{
+			Status: http.StatusUnauthorized,
+			Data:   nil,
+			Error:  &errAuth,
+		})
+	}
+
 	fmt.Printf("Received payload : %v\n", payload)
 
 	_, errDB := serviceDB.Connect()
@@ -121,7 +155,7 @@ func DeleteVoteItemByID(c echo.Context) error {
 		return errDB
 	}
 
-	errExec := serviceDB.DeleteVoteItemByID(payload)
+	errExec := serviceDB.DeleteVoteItemByID(userId, payload)
 	serviceDB.Close()
 
 	if errExec != nil {

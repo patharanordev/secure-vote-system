@@ -33,19 +33,21 @@ func main() {
 
 	serviceDB = database.Initial(dbConn)
 
-	// Middleware
+	// ----- Middleware -----
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	// Routes
+	// ----- Routes -----
 	e.GET("/health", healthcheck)
 
+	// Vote item
 	e.POST("/vote-item", CreateVoteItem)
 	e.PATCH("/vote-item", UpdateVoteItemByID)
 	e.DELETE("/vote-item", DeleteVoteItemByID)
 
-	// e.GET("/votes", database.GetVoteList)
-	// e.DELETE("/votes", database.DeleteVoteList)
+	// Vote list
+	e.GET("/votes", GetVoteList)
+	e.DELETE("/votes", DeleteVoteList)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
