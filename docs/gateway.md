@@ -6,7 +6,7 @@ This service provided middlewares to handle any incoming traffic before accessin
 
 The middleware including :
 
-- JWT Authorization service -- users **MUST** authorized before get info from our APIs.
+- JWT Authorization service — users **MUST** authorized before get info from our APIs.
 - Attached `x-user-id` or user ID into request header before calling our microservices. The ID will be referenced both frontend/backend :
 
     ```go
@@ -14,7 +14,7 @@ The middleware including :
     c.Request().Header.Set(s.ReqHeader.UserID, account.ID)
     ```
 
-- HTTP Request -- after user authorized, the service will calling target endpoint based on client required.
+- HTTP Request — after user authorized, the service will calling target endpoint based on client required.
 
     ***Example*** do healthcheck our microservice :
 
@@ -74,7 +74,7 @@ The middleware including :
 
 ## **Services**
 
-Generally I will separate account management service (sign-in/out/up) out to another service. In this situation, I attached the service into API gateway. 
+Generally I will separate account management service (sign-in/out/up) out to another service. In this situation, I attached the service into API gateway.
 
 > **CRUD**
 >

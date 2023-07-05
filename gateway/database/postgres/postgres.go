@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -126,8 +125,12 @@ func (p *PGProps) GetAccountByID(uid string) (*AccountProps, error) {
 		accounts = append(accounts, account)
 	}
 
-	account := accounts[0]
+	if len(accounts) <= 0 {
+		errNotFound := errors.New("Account not found.")
+		return nil, errNotFound
+	}
 
+	account := accounts[0]
 	return &account, nil
 }
 
@@ -135,9 +138,9 @@ func (p *PGProps) UpdateAccount(uid string, usr string, isAdmin bool) error {
 
 	result, err := p.db.Exec(`
 	UPDATE user_info 
-	SET username=$1, is_admin=$2, updated_at=$3 
-	WHERE uid=$4
-	`, usr, isAdmin, time.Now(), uid)
+	SET username=$1, is_admin=$2, updated_at=NOW() 
+	WHERE uid=$3
+	`, usr, isAdmin, uid)
 	if err != nil {
 		return err
 	}

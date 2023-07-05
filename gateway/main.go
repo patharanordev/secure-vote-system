@@ -29,32 +29,23 @@ func healthcheck(c echo.Context) error {
 	return c.String(http.StatusOK, "OK")
 }
 
-func handleError(c echo.Context, err error) error {
-	errMsg := err.Error()
-	return c.JSON(http.StatusBadGateway, &res.ResponseObject{
-		Status: http.StatusBadGateway,
-		Data:   nil,
-		Error:  &errMsg,
-	})
-}
-
 func restricted(c echo.Context) error {
 	resp, errRes := http.Get("http://apis:1323/health")
 	if errRes != nil {
-		return handleError(c, errRes)
+		return res.HandleError(c, resp.StatusCode, errRes)
 	}
 
 	body, errReadBody := ioutil.ReadAll(resp.Body)
 	if errReadBody != nil {
-		handleError(c, errReadBody)
+		res.HandleError(c, http.StatusBadGateway, errReadBody)
 	}
 
 	//Convert the body to type string
 	sb := string(body)
 	fmt.Printf("Calling internal API: %v\n", sb)
 
-	return c.JSON(http.StatusOK, &res.ResponseObject{
-		Status: http.StatusOK,
+	return c.JSON(resp.StatusCode, &res.ResponseObject{
+		Status: resp.StatusCode,
 		Data:   &sb,
 		Error:  nil,
 	})
@@ -88,9 +79,18 @@ func main() {
 	secGroup := e.Group("/api")
 	{
 		secGroup.Use(serviceAuth.IsAuth)
-		secGroup.GET("/v1/votes", restricted)
+
 		secGroup.POST("/v1/account", updateAccount)
 		secGroup.DELETE("/v1/account", deleteAccount)
+
+		// CRUD vote item
+		secGroup.POST("/v1/vote-item", AddVoteItem)
+		secGroup.PATCH("/v1/vote-item", UpdateVoteItem)
+		secGroup.DELETE("/v1/vote-item", ClearVoteItem)
+
+		// Vote list
+		secGroup.GET("/v1/votes", GetVotes)
+		secGroup.DELETE("/v1/votes", ClearVotes)
 	}
 
 	e.Logger.Fatal(e.Start(":1323"))

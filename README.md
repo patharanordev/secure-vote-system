@@ -14,8 +14,8 @@
 
 The service, including :
 
-- API Gateway -- available on port `9323`/`1323` (public/private).
-- Voting APIs -- available on port `1323` (private only).
+- API Gateway — available on port `9323`/`1323` (public/private).
+- Voting APIs — available on port `1323` (private only).
 - Web application
 
 ```sh
@@ -27,7 +27,7 @@ docker-compose -f docker-compose.dev.yml up --build
 
 [***Examples***]
 
-***Step#1 : Create user or Sign-up***
+***Step#1.1 : Create user or Sign-up***
 
 ```sh
 curl --location 'http://localhost:9323/signup' \
@@ -51,7 +51,7 @@ Response :
 
 ![create-user](assets/create-user.png)
 
-***Step#2 : Login***
+***Step#1.2 : Login***
 
 ```sh
 curl --location 'http://localhost:9323/login' \
@@ -67,27 +67,7 @@ Response :
 }
 ```
 
-***Step#3 : Voting list***
-
-```sh
-curl --location 'http://localhost:9323/api/v1/votes' \
---header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA3Y2MzMmI1LTRlNzMtNGEyZS1iYWI1LThkZTM5OWE0MWRmNSIsIm5hbWUiOiJKb24gU25vdyIsImFkbWluIjp0cnVlLCJpc3MiOiJ0ZXN0Iiwic3ViIjoic29tZWJvZHkiLCJhdWQiOlsic29tZWJvZHlfZWxzZSJdLCJleHAiOjE2ODgyMDMwNTgsIm5iZiI6MTY4ODExNjY1OCwiaWF0IjoxNjg4MTE2NjU4LCJqdGkiOiIxIn0.8Tp7n6MBitnkczEi-KkbP0ZVTiXQKxbt1z-8CB4UVGo'
-```
-
-Response :
-
-- headers :
-
-    ```json
-    { 
-        "server": "PatharaNor", 
-        "x-user-id": "07cc32b5-4e73-4a2e-bab5-8de399a41df5" 
-    }
-    ```
-
-- body: `Vote list`
-
-***Optional#1 : Edit account***
+***Optional#1.3 : Edit account***
 
 ```sh
 curl --location 'http://localhost:9323/api/v1/account' \
@@ -109,7 +89,7 @@ Response :
 }
 ```
 
-***Optional#2 : Delete account***
+***Optional#1.4 : Delete account***
 
 ```sh
 curl --location --request DELETE 'http://localhost:9323/api/v1/account' \
@@ -125,3 +105,11 @@ Response :
     "error": null
 }
 ```
+
+***Step#2.1 : CRUD Vote Item***
+
+More detail [here](./docs/api-vote-item.md).
+
+***Step#2.2 : Vote List***
+
+More detail [here](./docs/api-vote-list.md).
