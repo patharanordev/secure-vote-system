@@ -23,7 +23,10 @@ func HTTPRequest(c echo.Context, url string) error {
 		return res.HandleError(c, http.StatusBadRequest, errReq)
 	}
 
+	userId := c.Request().Header.Get("x-user-id")
+
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("x-user-id", userId)
 
 	resp, errResp := http.DefaultClient.Do(req)
 	if errResp != nil {

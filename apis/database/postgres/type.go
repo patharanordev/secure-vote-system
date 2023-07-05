@@ -22,6 +22,7 @@ type CreateVoteItemPayload struct {
 
 type VoteItemPayload struct {
 	ID          string `json:"id"`
+	UserID      string `json:"userId"`
 	Name        string `json:"itemName"`
 	Description string `json:"itemDescription"`
 	VoteCount   int    `json:"voteCount"`
@@ -50,10 +51,10 @@ type IDatabase interface {
 	SetDB(db *sql.DB)
 
 	// Vote item
-	CreateVoteItem(payload *CreateVoteItemPayload) ([]uint8, error)
-	GetVoteItemByID(payload *VoteItemIDPayload) (*VoteItemProps, error)
-	UpdateVoteItemByID(item *VoteItemPayload) error
-	DeleteVoteItemByID(payload *VoteItemIDPayload) error
+	CreateVoteItem(uid string, payload *CreateVoteItemPayload) ([]uint8, error)
+	GetVoteItemByID(uid string, payload *VoteItemIDPayload) (*VoteItemProps, error)
+	UpdateVoteItemByID(uid string, item *VoteItemPayload) error
+	DeleteVoteItemByID(uid string, payload *VoteItemIDPayload) error
 
 	// Vote list
 	GetVoteList() ([]VoteItemPayload, error)

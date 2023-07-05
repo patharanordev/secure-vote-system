@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -44,26 +43,27 @@ func (p *PGProps) SetDB(db *sql.DB) {
 
 // -------------------- item --------------------
 
-func (p *PGProps) CreateVoteItem(payload *CreateVoteItemPayload) ([]uint8, error) {
+func (p *PGProps) CreateVoteItem(uid string, payload *CreateVoteItemPayload) ([]uint8, error) {
 	fmt.Println("Creating vote item...")
 
 	var lastInsertId []uint8
 	err := p.db.QueryRow(`
-		INSERT INTO vote(item_name, item_description) 
-		VALUES( $1, $2 ) 
+		INSERT INTO vote(uid, item_name, item_description) 
+		VALUES( $1, $2, $3 ) 
 		returning vid;
-		`, payload.Name, payload.Description,
+		`, uid, payload.Name, payload.Description,
 	).Scan(&lastInsertId)
 
 	return lastInsertId, err
 }
 
-func (p *PGProps) GetVoteItemByID(payload *VoteItemIDPayload) (*VoteItemProps, error) {
+func (p *PGProps) GetVoteItemByID(uid string, payload *VoteItemIDPayload) (*VoteItemProps, error) {
 
 	qStr := fmt.Sprintf(`
 		SELECT vid, item_name, item_description, vote_count 
 		FROM vote 
-		WHERE vid = '%s'`, payload.VID)
+		WHERE uid = '%s' 
+		AND vid = '%s'`, uid, payload.VID)
 
 	rows, err := p.db.Query(qStr)
 	if err != nil {
@@ -91,16 +91,17 @@ func (p *PGProps) GetVoteItemByID(payload *VoteItemIDPayload) (*VoteItemProps, e
 	return &voteItem, nil
 }
 
-func (p *PGProps) UpdateVoteItemByID(item *VoteItemPayload) error {
+func (p *PGProps) UpdateVoteItemByID(uid string, item *VoteItemPayload) error {
 
 	result, err := p.db.Exec(`
 	UPDATE vote 
-	SET item_name=$1, item_description=$2, vote_count=$3, updated_at=$4 
-	WHERE vid=$5
+	SET item_name=$1, item_description=$2, vote_count=$3, updated_at=NOW() 
+	WHERE uid=$4 
+	AND vid=$5
 	`, item.Name,
 		item.Description,
 		item.VoteCount,
-		time.Now(),
+		uid,
 		item.ID,
 	)
 	if err != nil {
@@ -112,12 +113,13 @@ func (p *PGProps) UpdateVoteItemByID(item *VoteItemPayload) error {
 	return nil
 }
 
-func (p *PGProps) DeleteVoteItemByID(payload *VoteItemIDPayload) error {
+func (p *PGProps) DeleteVoteItemByID(uid string, payload *VoteItemIDPayload) error {
 
 	result, err := p.db.Exec(`
 	DELETE FROM vote 
-	WHERE vid=$1
-	`, payload.VID)
+	WHERE uid=$1 
+	AND vid=$2
+	`, uid, payload.VID)
 	if err != nil {
 		return err
 	}
@@ -132,7 +134,7 @@ func (p *PGProps) DeleteVoteItemByID(payload *VoteItemIDPayload) error {
 func (p *PGProps) GetVoteList() ([]VoteItemPayload, error) {
 
 	qStr := fmt.Sprintf(`
-		SELECT vid, item_name, item_description, vote_count 
+		SELECT vid, uid, item_name, item_description, vote_count 
 		FROM vote
 	`)
 
@@ -147,6 +149,7 @@ func (p *PGProps) GetVoteList() ([]VoteItemPayload, error) {
 		var voteItem VoteItemPayload
 		if errScan := rows.Scan(
 			&voteItem.ID,
+			&voteItem.UserID,
 			&voteItem.Name,
 			&voteItem.Description,
 			&voteItem.VoteCount,

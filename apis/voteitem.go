@@ -23,6 +23,17 @@ func CreateVoteItem(c echo.Context) error {
 		})
 	}
 
+	errAuth := "Unauthorized"
+	userId := c.Request().Header.Get("x-user-id")
+	fmt.Printf(" - User ID : %s\n", userId)
+	if len(userId) <= 0 {
+		return c.JSON(http.StatusUnauthorized, &res.ResponseObject{
+			Status: http.StatusUnauthorized,
+			Data:   nil,
+			Error:  &errAuth,
+		})
+	}
+
 	fmt.Printf(" - CreateVoteItem Received payload : %v\n", payload)
 
 	_, errDB := serviceDB.Connect()
@@ -32,7 +43,7 @@ func CreateVoteItem(c echo.Context) error {
 		return errDB
 	}
 
-	lastInsertId, errExec := serviceDB.CreateVoteItem(payload)
+	lastInsertId, errExec := serviceDB.CreateVoteItem(userId, payload)
 	serviceDB.Close()
 
 	if errExec != nil {
@@ -74,6 +85,17 @@ func UpdateVoteItemByID(c echo.Context) error {
 		})
 	}
 
+	errAuth := "Unauthorized"
+	userId := c.Request().Header.Get("x-user-id")
+	fmt.Printf(" - User ID : %s\n", userId)
+	if len(userId) <= 0 {
+		return c.JSON(http.StatusUnauthorized, &res.ResponseObject{
+			Status: http.StatusUnauthorized,
+			Data:   nil,
+			Error:  &errAuth,
+		})
+	}
+
 	fmt.Printf("Received payload : %v\n", payload)
 
 	_, errDB := serviceDB.Connect()
@@ -83,7 +105,7 @@ func UpdateVoteItemByID(c echo.Context) error {
 		return errDB
 	}
 
-	errExec := serviceDB.UpdateVoteItemByID(payload)
+	errExec := serviceDB.UpdateVoteItemByID(userId, payload)
 	serviceDB.Close()
 
 	if errExec != nil {
@@ -113,6 +135,17 @@ func DeleteVoteItemByID(c echo.Context) error {
 		})
 	}
 
+	errAuth := "Unauthorized"
+	userId := c.Request().Header.Get("x-user-id")
+	fmt.Printf(" - User ID : %s\n", userId)
+	if len(userId) <= 0 {
+		return c.JSON(http.StatusUnauthorized, &res.ResponseObject{
+			Status: http.StatusUnauthorized,
+			Data:   nil,
+			Error:  &errAuth,
+		})
+	}
+
 	fmt.Printf("Received payload : %v\n", payload)
 
 	_, errDB := serviceDB.Connect()
@@ -122,7 +155,7 @@ func DeleteVoteItemByID(c echo.Context) error {
 		return errDB
 	}
 
-	errExec := serviceDB.DeleteVoteItemByID(payload)
+	errExec := serviceDB.DeleteVoteItemByID(userId, payload)
 	serviceDB.Close()
 
 	if errExec != nil {
