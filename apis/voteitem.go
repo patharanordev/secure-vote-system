@@ -63,8 +63,9 @@ func CreateVoteItem(c echo.Context) error {
 }
 
 func UpdateVoteItemByID(c echo.Context) error {
-	payload := new(database.VoteItemProps)
+	payload := new(database.VoteItemPayload)
 	if err := c.Bind(payload); err != nil {
+		fmt.Printf("UpdateVoteItemByID error : %v\n", err.Error())
 		errMsg := "Your payload should contains 'id'."
 		return c.JSON(http.StatusBadRequest, &res.ResponseObject{
 			Status: http.StatusBadRequest,

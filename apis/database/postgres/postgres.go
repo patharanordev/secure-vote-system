@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -90,16 +91,17 @@ func (p *PGProps) GetVoteItemByID(payload *VoteItemIDPayload) (*VoteItemProps, e
 	return &voteItem, nil
 }
 
-func (p *PGProps) UpdateVoteItemByID(item *VoteItemProps) error {
+func (p *PGProps) UpdateVoteItemByID(item *VoteItemPayload) error {
 
 	result, err := p.db.Exec(`
 	UPDATE vote 
-	SET item_name=$1, item_description=$2, vote_count=$3 
-	WHERE vid=$4
-	`, item.Info.Name,
-		item.Info.Description,
-		item.Info.VoteCount,
-		item.VID,
+	SET item_name=$1, item_description=$2, vote_count=$3, updated_at=$4 
+	WHERE vid=$5
+	`, item.Name,
+		item.Description,
+		item.VoteCount,
+		time.Now(),
+		item.ID,
 	)
 	if err != nil {
 		return err
@@ -127,7 +129,7 @@ func (p *PGProps) DeleteVoteItemByID(payload *VoteItemIDPayload) error {
 
 // -------------------- list --------------------
 
-func (p *PGProps) GetVoteList() ([]VoteItemProps, error) {
+func (p *PGProps) GetVoteList() ([]VoteItemPayload, error) {
 
 	qStr := fmt.Sprintf(`
 		SELECT vid, item_name, item_description, vote_count 
@@ -140,14 +142,14 @@ func (p *PGProps) GetVoteList() ([]VoteItemProps, error) {
 	}
 
 	defer rows.Close()
-	voteItems := []VoteItemProps{}
+	voteItems := []VoteItemPayload{}
 	for rows.Next() {
-		var voteItem VoteItemProps
+		var voteItem VoteItemPayload
 		if errScan := rows.Scan(
-			&voteItem.VID,
-			&voteItem.Info.Name,
-			&voteItem.Info.Description,
-			&voteItem.Info.VoteCount,
+			&voteItem.ID,
+			&voteItem.Name,
+			&voteItem.Description,
+			&voteItem.VoteCount,
 		); errScan != nil {
 			return nil, errScan
 		}
