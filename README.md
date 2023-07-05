@@ -5,7 +5,7 @@
 - [API Gateway](./docs/gateway.md)
 - [Authentication/Authorization](./docs/authorization.md)
 - [Database](./docs/database.md)
-- Voting APIs
+- [Voting APIs](./docs/api.md)
 - Web Application
 
 ## **Usage**
@@ -106,10 +106,6 @@ Response :
 }
 ```
 
-***Step#2.1 : CRUD Vote Item***
+***Step#2 : Calling Vote APIs***
 
-More detail [here](./docs/api-vote-item.md).
-
-***Step#2.2 : Vote List***
-
-More detail [here](./docs/api-vote-list.md).
+More detail [here](./docs/api.md).
