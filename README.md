@@ -109,3 +109,13 @@ Response :
 ***Step#2 : Calling Vote APIs***
 
 More detail [here](./docs/api.md).
+
+## **Web**
+
+### **NextAuth**
+
+NEXTAUTH_SECRET:
+
+```sh
+openssl rand -base64 32
+```

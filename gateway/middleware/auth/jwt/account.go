@@ -12,11 +12,27 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (s *ServiceAuthProps) Login(c echo.Context) error {
-	username := c.FormValue("username")
-	password := c.FormValue("password")
+type LoginPayload struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	// CSRFToken string `json:"csrfToken"`
+}
 
-	userAccount, errAccount := s.getUser(username, password)
+func (s *ServiceAuthProps) Login(c echo.Context) error {
+	// username := c.FormValue("username")
+	// password := c.FormValue("password")
+
+	payload := new(LoginPayload)
+	if err := c.Bind(payload); err != nil {
+		errMsg := "Your payload should contains 'username', 'password'."
+		return c.JSON(http.StatusBadRequest, &res.ResponseObject{
+			Status: http.StatusBadRequest,
+			Data:   nil,
+			Error:  &errMsg,
+		})
+	}
+
+	userAccount, errAccount := s.getUser(payload.Username, payload.Password)
 	// Throws unauthorized error
 	if errAccount != nil {
 		errMsg := errAccount.Error()

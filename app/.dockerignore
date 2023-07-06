@@ -1,0 +1,12 @@
+docker-compose.*
+Dockerfile*
+.dockerignore
+node_modules
+npm-debug.log
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+README.md
+docs
+.next
+.git
