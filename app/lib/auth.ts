@@ -42,10 +42,10 @@ export const authOptions: NextAuthOptions = {
     ],
     callbacks: {
         session: ({ session, token }) => {
-            session = Object.assign({}, session, {accessToken: token.token})
             // console.log("Session Callback", { session, token });
             return {
                 ...session,
+                accessToken: token.accessToken,
                 user: {
                     ...session.user,
                     id: token.id,
@@ -83,7 +83,8 @@ export const authOptions: NextAuthOptions = {
                     ...token,
                     id: id,
                     name: name,
-                    isAdmin: admin
+                    isAdmin: admin,
+                    accessToken: u.token
                 };
             }
             return token;
