@@ -6,7 +6,7 @@
 - [Authentication/Authorization](./docs/authorization.md)
 - [Database](./docs/database.md)
 - [Voting APIs](./docs/api.md)
-- Web Application
+- [Web Application](./docs/web-app.md)
 
 ## **Usage**
 
@@ -55,8 +55,11 @@ Response :
 
 ```sh
 curl --location 'http://localhost:9323/login' \
---form 'username="PatharaNor"' \
---form 'password="1234567890"'
+--header 'Content-Type: application/json' \
+--data '{
+    "username": "PatharaNor1",
+    "password": "1234567890"
+}'
 ```
 
 Response :
@@ -112,10 +115,4 @@ More detail [here](./docs/api.md).
 
 ## **Web**
 
-### **NextAuth**
-
-NEXTAUTH_SECRET:
-
-```sh
-openssl rand -base64 32
-```
+More detail [here](./docs/web-app.md).

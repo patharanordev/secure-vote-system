@@ -1,8 +1,8 @@
 "use client"
 
 import { VoteListPayload, VoteItemProps } from "#/types"
-import MainContainer from "#/ui/container"
 import VoteItem from "#/ui/vote/vote-item"
+import { Grid } from "@mui/material";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
@@ -28,11 +28,32 @@ const VoteList = () => {
     }, [session])
 
     return (
-        <>
+        <Grid container sx={(theme) => ({
+            m: 2,
+            marginTop: 20,
+            
+            [theme.breakpoints.down('md')]: {
+                marginTop: 4
+            },
+
+            [theme.breakpoints.down('sm')]: {
+                marginTop: 0,
+                padding: 2
+            }
+        })}>
             {payload?.data?.map((v: VoteItemProps, i: number) => (
-                <VoteItem key={i} {...v} />
+                <Grid item key={`grid-${v.id}`} xs={12} sm={6} md={4}
+                    sx={(theme) => ({
+                        padding: 1,
+                        [theme.breakpoints.down('sm')]: {
+                            marginTop: 2,
+                        }
+                    })}
+                >
+                    <VoteItem key={v.id} {...v} />
+                </Grid>
             ))}
-        </>
+        </Grid>
     );
 }
 

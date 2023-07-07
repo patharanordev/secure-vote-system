@@ -5,7 +5,6 @@ export default async function DashboardPage() {
     <div
       style={{
         display: "flex",
-        height: "70vh",
         justifyContent: "center",
         alignItems: "center",
       }}
