@@ -23,7 +23,7 @@ func ServiceAuth() IServiceAuth {
 	s := &ServiceAuthProps{}
 	s.ReqHeader.Authorization = "Authorization"
 	s.ReqHeader.UserID = "x-user-id"
-	s.JwtSecret = "secret"
+	s.JwtSecret = "dCsm5RaR4AoVAbeUCrG0As+sz++65MTN+p8et/SHz0M="
 	s.AuthType = "Bearer"
 	s.ResMsg.Unauthorized = "Unauthorized"
 

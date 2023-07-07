@@ -62,8 +62,7 @@ func (p *PGProps) GetVoteItemByID(uid string, payload *VoteItemIDPayload) (*Vote
 	qStr := fmt.Sprintf(`
 		SELECT vid, item_name, item_description, vote_count 
 		FROM vote 
-		WHERE uid = '%s' 
-		AND vid = '%s'`, uid, payload.VID)
+		WHERE vid = '%s'`, payload.VID)
 
 	rows, err := p.db.Query(qStr)
 	if err != nil {
@@ -96,12 +95,10 @@ func (p *PGProps) UpdateVoteItemByID(uid string, item *VoteItemPayload) error {
 	result, err := p.db.Exec(`
 	UPDATE vote 
 	SET item_name=$1, item_description=$2, vote_count=$3, updated_at=NOW() 
-	WHERE uid=$4 
-	AND vid=$5
+	WHERE vid=$4
 	`, item.Name,
 		item.Description,
 		item.VoteCount,
-		uid,
 		item.ID,
 	)
 	if err != nil {
@@ -117,9 +114,8 @@ func (p *PGProps) DeleteVoteItemByID(uid string, payload *VoteItemIDPayload) err
 
 	result, err := p.db.Exec(`
 	DELETE FROM vote 
-	WHERE uid=$1 
-	AND vid=$2
-	`, uid, payload.VID)
+	WHERE vid=$1
+	`, payload.VID)
 	if err != nil {
 		return err
 	}
