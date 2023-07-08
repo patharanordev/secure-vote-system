@@ -20,6 +20,18 @@ The service, including :
 - Voting APIs — available on port `1323` (private only).
 - Web application — available on port `8381`/`3001` (public/private).
 
+For the web app, please creating `.env.local` inside `app` directory and adding content below start `docker-compose` :
+
+```env
+NEXTAUTH_SECRET=dCsm5RaR4AoVAbeUCrG0As+sz++65MTN+p8et/SHz0M=
+NEXTAUTH_URL=http://127.0.0.1:3001/api/auth
+API_HOST=http://gw:1323
+BASE_HOST=http://127.0.0.1:3001
+COOKIE_NAME=next-auth.session-token
+```
+
+Start all services :
+
 ```sh
 docker-compose -f docker-compose.dev.yml down -v && \
 docker-compose -f docker-compose.dev.yml up --build
