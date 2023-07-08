@@ -59,12 +59,12 @@ func (p *PGProps) CreateVoteItem(uid string, payload *CreateVoteItemPayload) ([]
 	return lastInsertId, err
 }
 
-func (p *PGProps) GetVoteItemByID(uid string, payload *VoteItemIDPayload) (*VoteItemProps, error) {
+func (p *PGProps) GetVoteItemByID(uid string, vid string) (*VoteItemProps, error) {
 
 	qStr := fmt.Sprintf(`
 		SELECT vid, item_name, item_description, vote_count 
 		FROM vote 
-		WHERE vid = '%s'`, payload.VID)
+		WHERE vid = '%s'`, vid)
 
 	rows, err := p.db.Query(qStr)
 	if err != nil {

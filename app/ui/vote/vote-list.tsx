@@ -16,7 +16,7 @@ const VoteList = () => {
             headers: { "Authorization": `Bearer ${token}` }
         }).then((res) => res.json());
 
-        console.log('VoteList session:', token);
+        // console.log('VoteList session:', token);
         console.log('VoteList payload:', payload);
         setPayload(payload);
     }

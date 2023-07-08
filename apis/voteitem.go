@@ -20,6 +20,52 @@ func handleExecError(c echo.Context, errExec error) error {
 	})
 }
 
+func GetVoteItem(c echo.Context) error {
+	id := c.QueryParam("id")
+
+	if len(id) < 1 {
+		errMsg := "Your payload should contains 'id'."
+		return c.JSON(http.StatusBadRequest, &res.ResponseObject{
+			Status: http.StatusBadRequest,
+			Data:   nil,
+			Error:  &errMsg,
+		})
+	}
+
+	errAuth := "Unauthorized"
+	userId := c.Request().Header.Get("x-user-id")
+	fmt.Printf(" - User ID : %s\n", userId)
+	if len(userId) <= 0 {
+		return c.JSON(http.StatusUnauthorized, &res.ResponseObject{
+			Status: http.StatusUnauthorized,
+			Data:   nil,
+			Error:  &errAuth,
+		})
+	}
+
+	fmt.Printf(" - GetVoteItemBy ID Received : %v\n", id)
+
+	_, errDB := serviceDB.Connect()
+
+	if errDB != nil {
+		fmt.Printf("Connect to database error : %s\n", errDB.Error())
+		return errDB
+	}
+
+	voteItem, errExec := serviceDB.GetVoteItemByID(userId, id)
+	serviceDB.Close()
+
+	if errExec != nil {
+		return handleExecError(c, errExec)
+	}
+
+	return c.JSON(http.StatusOK, &res.ResponseObject{
+		Status: http.StatusOK,
+		Data:   &voteItem,
+		Error:  nil,
+	})
+}
+
 func CreateVoteItem(c echo.Context) error {
 	payload := new(database.CreateVoteItemPayload)
 	if err := c.Bind(payload); err != nil {

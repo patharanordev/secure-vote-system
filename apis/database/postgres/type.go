@@ -11,7 +11,7 @@ type VoteItemInfoProps struct {
 }
 
 type VoteItemProps struct {
-	VID  []uint8           `json:"vid"`
+	VID  string            `json:"vid"`
 	Info VoteItemInfoProps `json:"info"`
 }
 
@@ -57,7 +57,7 @@ type IDatabase interface {
 
 	// Vote item
 	CreateVoteItem(uid string, payload *CreateVoteItemPayload) ([]uint8, error)
-	GetVoteItemByID(uid string, payload *VoteItemIDPayload) (*VoteItemProps, error)
+	GetVoteItemByID(uid string, vid string) (*VoteItemProps, error)
 	UpdateVoteItemByID(uid string, item *VoteItemPayload) error
 	UpVote(uid string, item *VotingPayload) error
 	DownVote(uid string, item *VotingPayload) error
