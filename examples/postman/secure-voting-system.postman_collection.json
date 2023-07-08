@@ -1,0 +1,969 @@
+{
+	"info": {
+		"_postman_id": "7c9a5abc-c50e-481d-8f97-311aa2145880",
+		"name": "secure-voting-system",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Signup",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"PatharaNor1\",\n    \"password\": \"1234567890\",\n    \"isAdmin\": false\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9323/signup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9323",
+					"path": [
+						"signup"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Account created",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"PatharaNor\",\n    \"password\": \"1234567890\",\n    \"isAdmin\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:1323/signup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1323",
+							"path": [
+								"signup"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Server",
+							"value": "PatharaNor"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Jul 2023 14:55:58 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "54"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 201,\n    \"data\": \"Account created.\",\n    \"error\": null\n}"
+				}
+			]
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const res = pm.response.json()",
+							"pm.environment.set(\"test_token\", res.token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"PatharaNor1\",\n    \"password\": \"1234567890\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9323/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9323",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Login",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"PatharaNor1\",\n    \"password\": \"1234567890\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9323/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9323",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Server",
+							"value": "PatharaNor"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 07 Jul 2023 00:44:29 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "378"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImViOGE1Y2JkLTQ4NDctNDMzNC1hMTljLTdiZjMzMTcwOTQzYiIsIm5hbWUiOiJQYXRoYXJhTm9yMSIsImFkbWluIjpmYWxzZSwiaXNzIjoiU2VjVm90ZVN5cyIsInN1YiI6IlNlY1ZvdGVTeXNfQ3VzdG9tQXV0aCIsImF1ZCI6WyJnZW5lcmFsX3VzZXIiXSwiZXhwIjoxNjg4Nzc3MDY5LCJuYmYiOjE2ODg2OTA2NjksImlhdCI6MTY4ODY5MDY2OSwianRpIjoiMSJ9.RC7I1tnkXO903fi1HKMVHjc3e0joaZL-69r8kOlF3UY\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Add vote item",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{test_token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"itemName\": \"item 2\",\n    \"itemDescription\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9323/api/v1/vote-item",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9323",
+					"path": [
+						"api",
+						"v1",
+						"vote-item"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update vote item",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{test_token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"d2ffde25-b36a-47b3-8084-19e197b87ce0\",\n    \"itemName\": \"item 2\",\n    \"itemDescription\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\n    \"voteCount\": 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9323/api/v1/vote-item",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9323",
+					"path": [
+						"api",
+						"v1",
+						"vote-item"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Update vote item",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{test_token}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"d2ffde25-b36a-47b3-8084-19e197b87ce0\",\n    \"itemName\": \"item 2\",\n    \"itemDescription\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\n    \"voteCount\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9323/api/v1/vote-item",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9323",
+							"path": [
+								"api",
+								"v1",
+								"vote-item"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Server",
+							"value": "PatharaNor"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 05 Jul 2023 09:04:42 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "56"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"data\": \"Vote item updated.\",\n    \"error\": null\n}"
+				}
+			]
+		},
+		{
+			"name": "Voting",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{test_token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"fb547f37-6f90-4c55-9b61-065fa7ca3aa4\",\n    \"isUp\": true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9323/api/v1/voting",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9323",
+					"path": [
+						"api",
+						"v1",
+						"voting"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Up vote",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{test_token}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"fb547f37-6f90-4c55-9b61-065fa7ca3aa4\",\n    \"isUp\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9323/api/v1/voting",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9323",
+							"path": [
+								"api",
+								"v1",
+								"voting"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Server",
+							"value": "PatharaNor"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 08 Jul 2023 13:00:58 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "51"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"data\": \"Vote success.\",\n    \"error\": null\n}"
+				},
+				{
+					"name": "Already vote",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{test_token}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"fb547f37-6f90-4c55-9b61-065fa7ca3aa4\",\n    \"isUp\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9323/api/v1/voting",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9323",
+							"path": [
+								"api",
+								"v1",
+								"voting"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Server",
+							"value": "PatharaNor"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 08 Jul 2023 13:02:35 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "65"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 400,\n    \"data\": null,\n    \"error\": \"You already vote this item.\"\n}"
+				},
+				{
+					"name": "Down vote",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{test_token}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"fb547f37-6f90-4c55-9b61-065fa7ca3aa4\",\n    \"isUp\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9323/api/v1/voting",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9323",
+							"path": [
+								"api",
+								"v1",
+								"voting"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Server",
+							"value": "PatharaNor"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 08 Jul 2023 13:03:00 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "51"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"data\": \"Vote success.\",\n    \"error\": null\n}"
+				},
+				{
+					"name": "Never vote",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{test_token}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"fb547f37-6f90-4c55-9b61-065fa7ca3aa4\",\n    \"isUp\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9323/api/v1/voting",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9323",
+							"path": [
+								"api",
+								"v1",
+								"voting"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Server",
+							"value": "PatharaNor"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 08 Jul 2023 13:03:20 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "63"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 400,\n    \"data\": null,\n    \"error\": \"You never vote this item.\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Clear vote item",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{test_token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"f39b10dc-3717-462b-9523-e71a007974a6\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9323/api/v1/vote-item",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9323",
+					"path": [
+						"api",
+						"v1",
+						"vote-item"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Clear vote item",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{test_token}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"d2ffde25-b36a-47b3-8084-19e197b87ce0\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9323/api/v1/vote-item",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9323",
+							"path": [
+								"api",
+								"v1",
+								"vote-item"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Server",
+							"value": "PatharaNor"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 05 Jul 2023 09:07:01 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "56"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"data\": \"Vote item deleted.\",\n    \"error\": null\n}"
+				}
+			]
+		},
+		{
+			"name": "Get vote list",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{test_token}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:9323/api/v1/votes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9323",
+					"path": [
+						"api",
+						"v1",
+						"votes"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get votes",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{test_token}}",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:9323/api/v1/votes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9323",
+							"path": [
+								"api",
+								"v1",
+								"votes"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Server",
+							"value": "PatharaNor"
+						},
+						{
+							"key": "Date",
+							"value": "Wed, 05 Jul 2023 13:20:28 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "574"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"data\": [\n        {\n            \"id\": \"e6087d49-23b3-443e-b12c-70dacc7c208c\",\n            \"itemDescription\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n            \"itemName\": \"item 1\",\n            \"userId\": \"173655f5-abcd-4125-908e-75cb4809d865\",\n            \"voteCount\": 0\n        },\n        {\n            \"id\": \"fb074920-7a0d-47ab-82fd-858e0e9b246d\",\n            \"itemDescription\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n            \"itemName\": \"item 2\",\n            \"userId\": \"173655f5-abcd-4125-908e-75cb4809d865\",\n            \"voteCount\": 0\n        },\n        {\n            \"id\": \"bdb06ef8-3cb9-489a-8e32-51b515cd2801\",\n            \"itemDescription\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\n            \"itemName\": \"item b\",\n            \"userId\": \"9348b95a-7c51-4bcc-9564-c0614c6831a8\",\n            \"voteCount\": 0\n        }\n    ],\n    \"error\": null\n}"
+				}
+			]
+		},
+		{
+			"name": "Clear vote list",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{test_token}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:9323/api/v1/votes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9323",
+					"path": [
+						"api",
+						"v1",
+						"votes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update account",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{test_token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"Bom Ja\",\n    \"isAdmin\": false\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9323/api/v1/account",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9323",
+					"path": [
+						"api",
+						"v1",
+						"account"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Update account",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{test_token}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"Bom Ja\",\n    \"isAdmin\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:1323/api/v1/account",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1323",
+							"path": [
+								"api",
+								"v1",
+								"account"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Server",
+							"value": "PatharaNor"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Jul 2023 14:57:05 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "54"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"data\": \"Account updated.\",\n    \"error\": null\n}"
+				}
+			]
+		},
+		{
+			"name": "Delete account",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{test_token}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:9323/api/v1/account",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9323",
+					"path": [
+						"api",
+						"v1",
+						"account"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Delete account",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{test_token}}",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:1323/api/v1/account",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "1323",
+							"path": [
+								"api",
+								"v1",
+								"account"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Server",
+							"value": "PatharaNor"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 03 Jul 2023 14:53:02 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "54"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"data\": \"Account deleted.\",\n    \"error\": null\n}"
+				}
+			]
+		},
+		{
+			"name": "GW Healthcheck",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9323/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9323",
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

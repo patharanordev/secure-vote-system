@@ -91,6 +91,9 @@ func main() {
 		// Vote list
 		secGroup.GET("/v1/votes", GetVotes)
 		secGroup.DELETE("/v1/votes", ClearVotes)
+
+		// Voting
+		secGroup.PATCH("/v1/voting", Voting)
 	}
 
 	e.Logger.Fatal(e.Start(":1323"))

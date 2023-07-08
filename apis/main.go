@@ -49,5 +49,8 @@ func main() {
 	e.GET("/votes", GetVoteList)
 	e.DELETE("/votes", DeleteVoteList)
 
+	// Voting
+	e.PATCH("/voting", Voting)
+
 	e.Logger.Fatal(e.Start(":1323"))
 }
