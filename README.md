@@ -24,9 +24,9 @@ For the web app, please creating `.env.local` inside `app` directory and adding 
 
 ```env
 NEXTAUTH_SECRET=dCsm5RaR4AoVAbeUCrG0As+sz++65MTN+p8et/SHz0M=
-NEXTAUTH_URL=http://127.0.0.1:3001/api/auth
+NEXTAUTH_URL=http://127.0.0.1:8381/api/auth
 API_HOST=http://gw:1323
-BASE_HOST=http://127.0.0.1:3001
+BASE_HOST=http://127.0.0.1:8381
 COOKIE_NAME=next-auth.session-token
 ```
 
