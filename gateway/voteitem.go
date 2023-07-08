@@ -14,6 +14,11 @@ func UpdateVoteItem(c echo.Context) error {
 	return HTTPRequest(c, url)
 }
 
+func Voting(c echo.Context) error {
+	url := "http://apis:1323/voting"
+	return HTTPRequest(c, url)
+}
+
 func ClearVoteItem(c echo.Context) error {
 	url := "http://apis:1323/vote-item"
 	return HTTPRequest(c, url)

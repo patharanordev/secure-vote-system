@@ -1,7 +1,9 @@
 package database
 
 import (
+	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	_ "github.com/lib/pq"
@@ -93,19 +95,13 @@ func (p *PGProps) GetVoteItemByID(uid string, payload *VoteItemIDPayload) (*Vote
 func (p *PGProps) UpdateVoteItemByID(uid string, item *VoteItemPayload) error {
 
 	result, err := p.db.Exec(`
-	BEGIN;
 	UPDATE vote 
 	SET item_name=$1, item_description=$2, vote_count=$3, updated_at=NOW() 
 	WHERE vid=$4;
-	INSERT INTO vote_history(vid, uid) 
-	VALUES( $5, $6);
-	END;
 	`, item.Name,
 		item.Description,
 		item.VoteCount,
 		item.ID,
-		item.ID,
-		item.UserID,
 	)
 
 	if err != nil {
@@ -113,6 +109,118 @@ func (p *PGProps) UpdateVoteItemByID(uid string, item *VoteItemPayload) error {
 	}
 
 	fmt.Printf("update result: %v\n", result)
+
+	return nil
+}
+
+func (p *PGProps) UpVote(uid string, item *VotingPayload) error {
+
+	ctx := context.Background()
+
+	tx, errTx := p.db.BeginTx(ctx, nil)
+	if errTx != nil {
+		return errTx
+	}
+
+	// Check ever vote or not
+	countRow := 0
+	rows, _ := tx.QueryContext(ctx, `
+		SELECT * 
+		FROM vote_history 
+		WHERE vid=$1 AND uid=$2
+	`, item.ID, uid)
+	defer rows.Close()
+	for rows.Next() {
+		countRow++
+	}
+	if countRow > 0 {
+		return errors.New("You already vote this item.")
+	}
+
+	// try to update
+	_, errUpdate := tx.ExecContext(ctx, `
+		UPDATE vote 
+		SET vote_count= vote_count+1, updated_at=NOW() 
+		WHERE vid=$1;
+	`, item.ID)
+
+	if errUpdate != nil {
+		tx.Rollback()
+		return errUpdate
+	}
+
+	// add history
+	_, errHistory := tx.ExecContext(ctx, `
+		INSERT INTO vote_history(vid, uid) 
+		VALUES( $1, $2);
+	`, item.ID, uid)
+
+	if errHistory != nil {
+		tx.Rollback()
+		return errHistory
+	}
+
+	// commit all commands
+	err := tx.Commit()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *PGProps) DownVote(uid string, item *VotingPayload) error {
+
+	ctx := context.Background()
+
+	tx, errTx := p.db.BeginTx(ctx, nil)
+	if errTx != nil {
+		return errTx
+	}
+
+	// Check ever vote or not
+	countRow := 0
+	rows, _ := tx.QueryContext(ctx, `
+		SELECT * 
+		FROM vote_history 
+		WHERE vid=$1 AND uid=$2
+	`, item.ID, uid)
+	defer rows.Close()
+	for rows.Next() {
+		countRow++
+	}
+	if countRow == 0 {
+		return errors.New("You never vote this item.")
+	}
+
+	// try to update
+	_, errUpdate := tx.ExecContext(ctx, `
+		UPDATE vote 
+		SET vote_count= vote_count-1, updated_at=NOW() 
+		WHERE vid=$1;
+	`, item.ID)
+
+	if errUpdate != nil {
+		tx.Rollback()
+		return errUpdate
+	}
+
+	// add history
+	_, errHistory := tx.ExecContext(ctx, `
+		DELETE FROM vote_history 
+		WHERE vid=$1 AND uid=$2;
+	`, item.ID, uid)
+
+	if errHistory != nil {
+		tx.Rollback()
+		return errHistory
+	}
+
+	// commit all commands
+	err := tx.Commit()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

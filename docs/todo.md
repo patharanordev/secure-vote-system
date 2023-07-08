@@ -15,6 +15,7 @@
 - ✅ Sign up/in/out system
 - ✅ API Gateway
 - ✅ Authentication/Authorization service
+- 📝 Load test
 - 📝 Voting APIs
   - ✅ CRUD vote iteam
   - ✅ Get/Delete all vote
@@ -23,7 +24,7 @@
 - 📝 Database recording
   - ✅ User account
   - ✅ Vote item
-  - 📝 Vote with condition (1 account per vote item)
+  - ✅ Vote with condition (1 account per vote item)
   - 📝 Testing
 - 📝 Web
   - ✅ Login page

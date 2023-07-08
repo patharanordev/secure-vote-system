@@ -112,6 +112,57 @@ func UpdateVoteItemByID(c echo.Context) error {
 	})
 }
 
+func Voting(c echo.Context) error {
+	payload := new(database.VotingPayload)
+	if err := c.Bind(payload); err != nil {
+		fmt.Printf("Voting error : %v\n", err.Error())
+		errMsg := "Your payload should contains 'id' and 'isUp'."
+		return c.JSON(http.StatusBadRequest, &res.ResponseObject{
+			Status: http.StatusBadRequest,
+			Data:   nil,
+			Error:  &errMsg,
+		})
+	}
+
+	errAuth := "Unauthorized"
+	userId := c.Request().Header.Get("x-user-id")
+	fmt.Printf(" - User ID : %s\n", userId)
+	if len(userId) <= 0 {
+		return c.JSON(http.StatusUnauthorized, &res.ResponseObject{
+			Status: http.StatusUnauthorized,
+			Data:   nil,
+			Error:  &errAuth,
+		})
+	}
+
+	fmt.Printf("Received payload : %v\n", payload)
+
+	_, errDB := serviceDB.Connect()
+
+	if errDB != nil {
+		fmt.Printf("Connect to database error : %s\n", errDB.Error())
+		return errDB
+	}
+
+	var errExec error
+	if payload.IsUp {
+		errExec = serviceDB.UpVote(userId, payload)
+	} else {
+		errExec = serviceDB.DownVote(userId, payload)
+	}
+	serviceDB.Close()
+
+	if errExec != nil {
+		return handleExecError(c, errExec)
+	}
+
+	return c.JSON(http.StatusOK, &res.ResponseObject{
+		Status: http.StatusOK,
+		Data:   "Vote success.",
+		Error:  nil,
+	})
+}
+
 func DeleteVoteItemByID(c echo.Context) error {
 	payload := new(database.VoteItemIDPayload)
 	if err := c.Bind(payload); err != nil {
