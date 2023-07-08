@@ -66,3 +66,56 @@ Response :
     "error": null
 }
 ```
+
+## **Voting**
+
+Including 4-journeies :
+
+- Up vote
+- Already up vote
+- Down vote
+- Never vote
+
+### **Up vote**
+
+```sh
+curl --location --request PATCH 'http://localhost:9323/api/v1/voting' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE5YjM2YTVlLTRmMDktNDIyZS05M2E4LTI4YWRkOTBlN2MxYiIsIm5hbWUiOiJQYXRoYXJhTm9yIiwiYWRtaW4iOmZhbHNlLCJpc3MiOiJTZWNWb3RlU3lzIiwic3ViIjoiU2VjVm90ZVN5c19DdXN0b21BdXRoIiwiYXVkIjpbImdlbmVyYWxfdXNlciJdLCJleHAiOjE2ODg5MDM2MjAsIm5iZiI6MTY4ODgxNzIyMCwiaWF0IjoxNjg4ODE3MjIwLCJqdGkiOiIxIn0.ZqdzNheZzALvUU9_ea__Y_ObrRJc0GYDSVOGgQnF4A8' \
+--data '{
+    "id": "fb547f37-6f90-4c55-9b61-065fa7ca3aa4",
+    "isUp": true
+}'
+```
+
+### **Already up vote**
+
+```sh
+curl --location --request PATCH 'http://localhost:9323/api/v1/voting' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE5YjM2YTVlLTRmMDktNDIyZS05M2E4LTI4YWRkOTBlN2MxYiIsIm5hbWUiOiJQYXRoYXJhTm9yIiwiYWRtaW4iOmZhbHNlLCJpc3MiOiJTZWNWb3RlU3lzIiwic3ViIjoiU2VjVm90ZVN5c19DdXN0b21BdXRoIiwiYXVkIjpbImdlbmVyYWxfdXNlciJdLCJleHAiOjE2ODg5MDM2MjAsIm5iZiI6MTY4ODgxNzIyMCwiaWF0IjoxNjg4ODE3MjIwLCJqdGkiOiIxIn0.ZqdzNheZzALvUU9_ea__Y_ObrRJc0GYDSVOGgQnF4A8' \
+--data '{
+    "id": "fb547f37-6f90-4c55-9b61-065fa7ca3aa4",
+    "isUp": true
+}'
+```
+
+### **Down vote**
+
+```sh
+curl --location --request PATCH 'http://localhost:9323/api/v1/voting' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE5YjM2YTVlLTRmMDktNDIyZS05M2E4LTI4YWRkOTBlN2MxYiIsIm5hbWUiOiJQYXRoYXJhTm9yIiwiYWRtaW4iOmZhbHNlLCJpc3MiOiJTZWNWb3RlU3lzIiwic3ViIjoiU2VjVm90ZVN5c19DdXN0b21BdXRoIiwiYXVkIjpbImdlbmVyYWxfdXNlciJdLCJleHAiOjE2ODg5MDM2MjAsIm5iZiI6MTY4ODgxNzIyMCwiaWF0IjoxNjg4ODE3MjIwLCJqdGkiOiIxIn0.ZqdzNheZzALvUU9_ea__Y_ObrRJc0GYDSVOGgQnF4A8' \
+--data '{
+    "id": "fb547f37-6f90-4c55-9b61-065fa7ca3aa4",
+    "isUp": false
+}'
+```
+
+### **Never vote**
+
+```sh
+curl --location --request PATCH 'http://localhost:9323/api/v1/voting' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE5YjM2YTVlLTRmMDktNDIyZS05M2E4LTI4YWRkOTBlN2MxYiIsIm5hbWUiOiJQYXRoYXJhTm9yIiwiYWRtaW4iOmZhbHNlLCJpc3MiOiJTZWNWb3RlU3lzIiwic3ViIjoiU2VjVm90ZVN5c19DdXN0b21BdXRoIiwiYXVkIjpbImdlbmVyYWxfdXNlciJdLCJleHAiOjE2ODg5MDM2MjAsIm5iZiI6MTY4ODgxNzIyMCwiaWF0IjoxNjg4ODE3MjIwLCJqdGkiOiIxIn0.ZqdzNheZzALvUU9_ea__Y_ObrRJc0GYDSVOGgQnF4A8' \
+--data '{
+    "id": "fb547f37-6f90-4c55-9b61-065fa7ca3aa4",
+    "isUp": false
+}'
+```

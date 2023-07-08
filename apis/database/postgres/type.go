@@ -28,6 +28,11 @@ type VoteItemPayload struct {
 	VoteCount   int    `json:"voteCount"`
 }
 
+type VotingPayload struct {
+	ID   string `json:"id"`
+	IsUp bool   `json:"isUp"`
+}
+
 type VoteItemIDPayload struct {
 	VID string `json:"id"`
 }
@@ -54,6 +59,8 @@ type IDatabase interface {
 	CreateVoteItem(uid string, payload *CreateVoteItemPayload) ([]uint8, error)
 	GetVoteItemByID(uid string, payload *VoteItemIDPayload) (*VoteItemProps, error)
 	UpdateVoteItemByID(uid string, item *VoteItemPayload) error
+	UpVote(uid string, item *VotingPayload) error
+	DownVote(uid string, item *VotingPayload) error
 	DeleteVoteItemByID(uid string, payload *VoteItemIDPayload) error
 
 	// Vote list

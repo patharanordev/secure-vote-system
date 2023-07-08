@@ -35,6 +35,12 @@ Let's :
 
 ### **Calling APIs**
 
+> ---
+>
+> Ref. [Postman collection](./examples/postman/secure-voting-system.postman_collection.json).
+>
+> ---
+
 ***User Account & Voting APIs***
 
 More detail [here](./docs/api.md).
