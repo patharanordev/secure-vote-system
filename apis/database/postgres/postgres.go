@@ -93,14 +93,21 @@ func (p *PGProps) GetVoteItemByID(uid string, payload *VoteItemIDPayload) (*Vote
 func (p *PGProps) UpdateVoteItemByID(uid string, item *VoteItemPayload) error {
 
 	result, err := p.db.Exec(`
+	BEGIN;
 	UPDATE vote 
 	SET item_name=$1, item_description=$2, vote_count=$3, updated_at=NOW() 
-	WHERE vid=$4
+	WHERE vid=$4;
+	INSERT INTO vote_history(vid, uid) 
+	VALUES( $5, $6);
+	END;
 	`, item.Name,
 		item.Description,
 		item.VoteCount,
 		item.ID,
+		item.ID,
+		item.UserID,
 	)
+
 	if err != nil {
 		return err
 	}

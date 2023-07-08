@@ -3,13 +3,22 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
 	database "apis/database/postgres"
 	res "apis/response"
 
 	"github.com/labstack/echo/v4"
 )
+
+func handleExecError(c echo.Context, errExec error) error {
+	errExecMsg := errExec.Error()
+	fmt.Printf("Execute SQL error : %s", errExecMsg)
+	return c.JSON(http.StatusBadRequest, &res.ResponseObject{
+		Status: http.StatusBadRequest,
+		Data:   nil,
+		Error:  &errExecMsg,
+	})
+}
 
 func CreateVoteItem(c echo.Context) error {
 	payload := new(database.CreateVoteItemPayload)
@@ -43,28 +52,12 @@ func CreateVoteItem(c echo.Context) error {
 		return errDB
 	}
 
-	lastInsertId, errExec := serviceDB.CreateVoteItem(userId, payload)
+	_, errExec := serviceDB.CreateVoteItem(userId, payload)
 	serviceDB.Close()
 
 	if errExec != nil {
-		errExecMsg := errExec.Error()
-		reason := errExecMsg
-
-		fmt.Printf("Insert to database error : %s", errExecMsg)
-		if strings.Contains(errExecMsg, "duplicate key") {
-			reason = "The user name already exists."
-		} else {
-			reason = "Cannot create the account."
-		}
-
-		return c.JSON(http.StatusBadRequest, &res.ResponseObject{
-			Status: http.StatusBadRequest,
-			Data:   nil,
-			Error:  &reason,
-		})
+		return handleExecError(c, errExec)
 	}
-
-	fmt.Println("Created, last inserted id : ", lastInsertId)
 
 	return c.JSON(http.StatusCreated, &res.ResponseObject{
 		Status: http.StatusCreated,
@@ -109,12 +102,7 @@ func UpdateVoteItemByID(c echo.Context) error {
 	serviceDB.Close()
 
 	if errExec != nil {
-		errExecMsg := errExec.Error()
-		return c.JSON(http.StatusBadRequest, &res.ResponseObject{
-			Status: http.StatusBadRequest,
-			Data:   nil,
-			Error:  &errExecMsg,
-		})
+		return handleExecError(c, errExec)
 	}
 
 	return c.JSON(http.StatusOK, &res.ResponseObject{
@@ -159,12 +147,7 @@ func DeleteVoteItemByID(c echo.Context) error {
 	serviceDB.Close()
 
 	if errExec != nil {
-		errExecMsg := errExec.Error()
-		return c.JSON(http.StatusBadRequest, &res.ResponseObject{
-			Status: http.StatusBadRequest,
-			Data:   nil,
-			Error:  &errExecMsg,
-		})
+		return handleExecError(c, errExec)
 	}
 
 	return c.JSON(http.StatusOK, &res.ResponseObject{

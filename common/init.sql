@@ -28,3 +28,13 @@ CREATE TABLE IF NOT EXISTS vote
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     CONSTRAINT vote_pkey PRIMARY KEY (vid)
 );
+
+-- vote history table
+CREATE TABLE IF NOT EXISTS vote_history
+(
+    vid uuid NOT NULL,
+    uid uuid NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    CONSTRAINT vote_history_pkey PRIMARY KEY (vid, uid)
+);
