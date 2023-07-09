@@ -59,12 +59,12 @@ func (p *PGProps) CreateVoteItem(uid string, payload *CreateVoteItemPayload) ([]
 	return lastInsertId, err
 }
 
-func (p *PGProps) GetVoteItemByID(uid string, payload *VoteItemIDPayload) (*VoteItemProps, error) {
+func (p *PGProps) GetVoteItemByID(uid string, vid string) (*VoteItemProps, error) {
 
 	qStr := fmt.Sprintf(`
 		SELECT vid, item_name, item_description, vote_count 
 		FROM vote 
-		WHERE vid = '%s'`, payload.VID)
+		WHERE vid = '%s'`, vid)
 
 	rows, err := p.db.Query(qStr)
 	if err != nil {
@@ -92,15 +92,16 @@ func (p *PGProps) GetVoteItemByID(uid string, payload *VoteItemIDPayload) (*Vote
 	return &voteItem, nil
 }
 
-func (p *PGProps) UpdateVoteItemByID(uid string, item *VoteItemPayload) error {
+func (p *PGProps) UpdateVoteItemByID(uid string, item *EditVoteItemPayload) error {
 
 	result, err := p.db.Exec(`
 	UPDATE vote 
-	SET item_name=$1, item_description=$2, vote_count=$3, updated_at=NOW() 
-	WHERE vid=$4;
+	SET item_name=$1, item_description=$2, updated_at=NOW() 
+	WHERE uid=$3 
+	AND vid=$4;
 	`, item.Name,
 		item.Description,
-		item.VoteCount,
+		uid,
 		item.ID,
 	)
 
@@ -246,7 +247,8 @@ func (p *PGProps) GetVoteList() ([]VoteItemPayload, error) {
 
 	qStr := fmt.Sprintf(`
 		SELECT vid, uid, item_name, item_description, vote_count 
-		FROM vote
+		FROM vote 
+		ORDER BY vote_count DESC
 	`)
 
 	rows, err := p.db.Query(qStr)

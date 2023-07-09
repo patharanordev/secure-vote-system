@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 export { default } from "next-auth/middleware";
 
 export const config = {
-  // matcher: ["/dashboard"],
   matcher: ["/((?!register|signup|api|login).*)"],
 };
 
@@ -17,13 +16,13 @@ export async function middleware(request: NextRequest) {
 
   // redirect user without access to login
   if (token?.token && Date.now() / 1000 < token?.exp) {
-    return NextResponse.redirect("/login");
+    return NextResponse.redirect(`${process.env.BASE_HOST}/login`);
   }
 
   const res = NextResponse.next()
   // // redirect user without admin access to login
   // if (!token?.isAdmin) {
-  //   return NextResponse.redirect("/login");
+  //   return NextResponse.redirect(`${process.env.BASE_HOST}/login`);
   // }
 
   // add the CORS headers to the response

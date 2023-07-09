@@ -10,7 +10,7 @@ curl --location 'http://localhost:9323/signup' \
 --data '{
     "username": "PatharaNor",
     "password": "1234567890",
-    "isAdmin": true
+    "isAdmin": false
 }'
 ```
 
