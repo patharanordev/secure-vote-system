@@ -3,7 +3,7 @@ import { Account, EUserMenu } from "#/types"
 import React from "react";
 import { signOut } from "next-auth/react"
 
-const settings = [EUserMenu.Logout];
+const settings = [EUserMenu.AddItem, EUserMenu.Logout];
 
 export const User = (props: Account) => {
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
@@ -14,6 +14,12 @@ export const User = (props: Account) => {
   
     const handleCloseUserMenu = (menu: string) => {
         switch(menu) {
+            case EUserMenu.AddItem:
+                if (typeof props.onAddItem === "function") {
+                    console.log('on click add vote info...')
+                    props.onAddItem()
+                }
+                break;
             case EUserMenu.Logout:
                 signOut();
                 break;

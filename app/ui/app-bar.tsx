@@ -13,11 +13,20 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { User } from '#/ui/account/user';
-import { Account } from "#/types"
+import { Account, VoteInfo } from "#/types"
 import { useSession } from 'next-auth/react';
 
-function ResponsiveAppBar() {
+type Props = {
+  onAddItem?: Function
+}
+
+function ResponsiveAppBar(props: Props) {
   const { data: session } = useSession();
+  const onAddItem = () => {
+    if (typeof props.onAddItem === 'function') {
+      props.onAddItem()
+    }
+  }
 
   return (
     <AppBar position="static">
@@ -33,7 +42,7 @@ function ResponsiveAppBar() {
             name: session?.user?.name,
             image: session?.user?.image,
             email: session?.user?.email
-          }} />
+          }} onAddItem={onAddItem} />
         </Toolbar>
       </Container>
     </AppBar>

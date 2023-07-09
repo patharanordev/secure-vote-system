@@ -30,7 +30,7 @@ export type VotingPayload = {
 export type VoteInfo = {
     itemDescription: string
     itemName: string
-    voteCount: number
+    voteCount?: number
 };
 
 export type VoteInfoItem = {
