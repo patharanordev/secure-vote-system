@@ -41,9 +41,30 @@ Response :
 
 ## **Clear Vote List**
 
+> For admin ***ONLY***.
+
+***In case : You have no permission***
+
 ```sh
 curl --location --request DELETE 'http://localhost:9323/api/v1/votes' \
---header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjNlMTE1MmE4LTc0YjUtNDUyMi05ZjE0LWE4MzAxMmUwMGFiOCIsIm5hbWUiOiJQYXRoYXJhTm9yIiwiYWRtaW4iOmZhbHNlLCJpc3MiOiJTZWNWb3RlU3lzIiwic3ViIjoiU2VjVm90ZVN5c19DdXN0b21BdXRoIiwiYXVkIjpbImdlbmVyYWxfdXNlciJdLCJleHAiOjE2ODg1NzIyMzgsIm5iZiI6MTY4ODQ4NTgzOCwiaWF0IjoxNjg4NDg1ODM4LCJqdGkiOiIxIn0.2zBydhR_x2fXchABOxGgcrAHzNBCYYmse_uocFzdvDc'
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjFmMmU3NzhlLThlNWItNGNjZC04ZGQ1LWExNjA2YjU5NmRiYyIsIm5hbWUiOiJQYXRoYXJhQWRtaW4iLCJhZG1pbiI6dHJ1ZSwiaXNzIjoiU2VjVm90ZVN5cyIsInN1YiI6IlNlY1ZvdGVTeXNfQ3VzdG9tQXV0aCIsImF1ZCI6WyJnZW5lcmFsX3VzZXIiXSwiZXhwIjoxNjg4OTc1NzQ2LCJuYmYiOjE2ODg4ODkzNDYsImlhdCI6MTY4ODg4OTM0NiwianRpIjoiMSJ9.1n-SvfqHT-8R69wH3xMXMUbYe0H1WRzqsIAsgykAUmU'
+```
+
+Response :
+
+```json
+{
+    "status": 403,
+    "data": null,
+    "error": "Your role cannot access to the resource."
+}
+```
+
+***In case : You are admin***
+
+```sh
+curl --location --request DELETE 'http://localhost:9323/api/v1/votes' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjFmMmU3NzhlLThlNWItNGNjZC04ZGQ1LWExNjA2YjU5NmRiYyIsIm5hbWUiOiJQYXRoYXJhQWRtaW4iLCJhZG1pbiI6dHJ1ZSwiaXNzIjoiU2VjVm90ZVN5cyIsInN1YiI6IlNlY1ZvdGVTeXNfQ3VzdG9tQXV0aCIsImF1ZCI6WyJnZW5lcmFsX3VzZXIiXSwiZXhwIjoxNjg4OTc1NzQ2LCJuYmYiOjE2ODg4ODkzNDYsImlhdCI6MTY4ODg4OTM0NiwianRpIjoiMSJ9.1n-SvfqHT-8R69wH3xMXMUbYe0H1WRzqsIAsgykAUmU'
 ```
 
 Response :
