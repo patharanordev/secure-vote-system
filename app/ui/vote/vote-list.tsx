@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 type Props = {
     list: VoteItemProps[]
     onVoteSuccess?: Function
+    onClickDelete?: Function
 }
 
 const VoteList = (props: Props) => {
@@ -16,6 +17,12 @@ const VoteList = (props: Props) => {
     const onVoteSuccess = (vid: string) => {
         if (typeof props.onVoteSuccess === 'function') {
             props.onVoteSuccess(vid)
+        }
+    }
+
+    const onClickDelete = (vid: string) => {
+        if (typeof props.onClickDelete === 'function') {
+            props.onClickDelete(vid)
         }
     }
 
@@ -48,7 +55,10 @@ const VoteList = (props: Props) => {
                         }
                     })}
                 >
-                    <VoteItem key={v.id} {...v} onVoteSuccess={onVoteSuccess} />
+                    <VoteItem key={v.id} {...v} 
+                        onVoteSuccess={onVoteSuccess} 
+                        onClickDelete={onClickDelete}
+                    />
                 </Grid>
             ))}
         </Grid>

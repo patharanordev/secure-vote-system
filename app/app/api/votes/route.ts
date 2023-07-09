@@ -9,8 +9,12 @@ export async function GET(req: Request) {
 
         const data = await res.json();
         console.log('votes api:', data)
-        
-        return new NextResponse(JSON.stringify(data));
+
+        if (data?.status === 401) {
+            return NextResponse.redirect(`${process.env.BASE_HOST}/login`);
+        } else {
+            return new NextResponse(JSON.stringify(data));
+        }
 
     } catch (error: any) {
         console.log(error)

@@ -1,6 +1,6 @@
 "use client"
 
-import { VoteInfo, VoteItemPayload, VoteListPayload } from "#/types";
+import { VoteInfo, VoteItemIDPayload, VoteItemPayload, VoteListPayload } from "#/types";
 import ResponsiveAppBar from "#/ui/app-bar";
 import AddItemDialog from "#/ui/dialog/dlg-add-item";
 import VoteList from "#/ui/vote/vote-list"
@@ -31,6 +31,21 @@ const DashboardPage = () => {
     return res.error
   }
 
+  const deleteItem = async (payload: VoteItemIDPayload) => {
+    const res: VoteItemPayload = await fetch('/api/vote-item', {
+        method: "DELETE",
+        body: JSON.stringify({ ...payload }),
+        headers: { 
+            "Content-Type": "application/json", 
+            "Authorization": `Bearer ${token}`
+        }
+    }).then((res) => res.json());
+
+    console.log('Delete vote item res:', res);
+
+    return res.error
+  }
+
   const load = async (token: string) => {
     const payload: VoteListPayload = await fetch('/api/votes', {
         method: "GET",
@@ -48,7 +63,7 @@ const DashboardPage = () => {
   }
 
   const onSaveVoteInfo = async (data: VoteInfo) => {
-    console.log('Vote info:', data)
+    console.log('Save vote info:', data)
     const isError = await createItem(data);
 
     if (!isError) {
@@ -58,8 +73,16 @@ const DashboardPage = () => {
   }
 
   const onCancelVoteInfo = (data: VoteInfo) => {
-    console.log('Vote info:', data)
     setOpenAddItem(false)
+  }
+
+  const onClickDelete = async (id: string) => {
+    console.log('Delete vote info:', id)
+    const isError = await deleteItem({ id });
+
+    if (!isError) {
+      load(token ?? "")
+    }
   }
 
   const onVoteSuccess = (id: string) => {
@@ -97,6 +120,7 @@ const DashboardPage = () => {
           <VoteList 
             list={ payload?.data ?? [] } 
             onVoteSuccess={onVoteSuccess}
+            onClickDelete={onClickDelete}
           />
         </div>
         <AddItemDialog 

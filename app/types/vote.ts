@@ -5,6 +5,8 @@ export type VoteItemProps = {
     userId: string;
     voteCount: number;
     onVoteSuccess?: Function;
+    onClickEdit?: Function;
+    onClickDelete?: Function;
 }
 
 export type VoteItemIDPayload = {

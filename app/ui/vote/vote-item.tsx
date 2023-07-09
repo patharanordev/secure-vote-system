@@ -16,11 +16,12 @@ import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
+import { Avatar, Box, Button, Divider, Typography } from '@mui/material';
 
 const Item = styled(Paper)(({ theme }) => ({
     ...theme.typography.body2,
     color: theme.palette.text.secondary,
-    height: 196,
+    height: 242,
     lineHeight: '60px',
 }));
 
@@ -35,7 +36,6 @@ const Content = styled(Paper)(({ theme }) => ({
 export default function VoteItem(props: VoteItemProps) {
     const { data: session } = useSession();
     const [voteCount, setVoteCount] = useState<number>(props.voteCount);
-    const [payload, setPayload] = useState<VoteItemPayload|null>(null);
     const [token, setToken] = useState<string|null>(null);
 
     const getItemById = async (id: string) => {
@@ -65,7 +65,6 @@ export default function VoteItem(props: VoteItemProps) {
 
         // console.log('VoteItem session:', token);
         console.log('VoteItem res:', res);
-        setPayload(res);
         getItemById(props.id);
     }
 
@@ -81,6 +80,18 @@ export default function VoteItem(props: VoteItemProps) {
 
     const onDownVote = () => {
         vote({ id:props.id, isUp:false })
+    }
+
+    const onClickEdit = () => {
+        if (typeof props.onClickEdit === 'function') {
+            props.onClickEdit(props.id)
+        }
+    }
+
+    const onClickDelete = () => {
+        if (typeof props.onClickDelete === 'function') {
+            props.onClickDelete(props.id)
+        }
     }
 
     return (
@@ -115,6 +126,24 @@ export default function VoteItem(props: VoteItemProps) {
                             fontSize: 14,
                         }}>{props.itemDescription}</Content>
                     </Stack>
+                </Grid>
+                <Grid item xs={12}>
+                    <Grid container>
+                        <Grid item xs={6} sx={{ display: 'flex', justifyContent: "left" }}>
+                            <Box sx={{ display: 'flex' }}>
+                                <Avatar alt="user-image" src="" />
+                                <Typography sx={{ p: 2 }}>
+                                {session?.user?.name ?? ""}
+                                </Typography>
+                            </Box>
+                        </Grid>
+                        <Grid item xs={6} sx={{ display: 'flex', justifyContent: "right" }}>
+                            <Box sx={{ display: 'flex' }}>
+                                <Button variant="text" onClick={onClickEdit}>Edit</Button>
+                                <Button variant="text" onClick={onClickDelete}>Delete</Button>
+                            </Box>
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Grid>
         </Item>
