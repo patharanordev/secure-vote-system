@@ -6,25 +6,26 @@ import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import { VoteInfo } from '#/types';
+import { VoteInfo, VoteItemProps } from '#/types';
 import { Stack } from '@mui/material';
 
 type DialogProps = {
     isOpen: boolean
     onSave?: Function
     onCancel?: Function
+    defaultProps?: VoteInfo
 }
 
-const DEFAULT_INFO: VoteInfo = {
+export const DEFAULT_VOTE_INFO: VoteInfo = {
+    id: '',
     itemName: '',
     itemDescription: ''
 }
 
-export default function AddItemDialog(props: DialogProps) {
+export default function ModifyVoteItemDialog(props: DialogProps) {
     const [open, setOpen] = useState<boolean>(props.isOpen);
-    const [data, setData] = useState<VoteInfo>(DEFAULT_INFO);
+    const [data, setData] = useState<VoteInfo>(DEFAULT_VOTE_INFO);
 
     const handleClickCancel = () => {
         setOpen(false)
@@ -63,6 +64,16 @@ export default function AddItemDialog(props: DialogProps) {
       setOpen(props.isOpen)
     }, [props.isOpen])
 
+    useEffect(() => {
+        if (props.defaultProps) {
+            setData({ 
+                id: props.defaultProps.id,
+                itemName: props.defaultProps.itemName,
+                itemDescription: props.defaultProps.itemDescription
+            })
+        }
+    }, [props.defaultProps])
+
     return (
         <Dialog 
             open={open} 
@@ -80,6 +91,7 @@ export default function AddItemDialog(props: DialogProps) {
                         label="Item name"
                         fullWidth
                         variant="standard"
+                        defaultValue={data.itemName}
                         onChange={onChange}
                     />
                     <TextField
@@ -88,6 +100,7 @@ export default function AddItemDialog(props: DialogProps) {
                         label="Item description"
                         fullWidth
                         variant="standard"
+                        defaultValue={data.itemDescription}
                         onChange={onChange}
                     />
                 </Stack>

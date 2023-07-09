@@ -16,7 +16,7 @@ import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
-import { Avatar, Box, Button, Divider, Typography } from '@mui/material';
+import { Avatar, Box, Button, Typography } from '@mui/material';
 
 const Item = styled(Paper)(({ theme }) => ({
     ...theme.typography.body2,
@@ -84,7 +84,11 @@ export default function VoteItem(props: VoteItemProps) {
 
     const onClickEdit = () => {
         if (typeof props.onClickEdit === 'function') {
-            props.onClickEdit(props.id)
+            props.onClickEdit({
+                id: props.id,
+                itemName: props.itemName,
+                itemDescription: props.itemDescription
+            })
         }
     }
 

@@ -92,15 +92,16 @@ func (p *PGProps) GetVoteItemByID(uid string, vid string) (*VoteItemProps, error
 	return &voteItem, nil
 }
 
-func (p *PGProps) UpdateVoteItemByID(uid string, item *VoteItemPayload) error {
+func (p *PGProps) UpdateVoteItemByID(uid string, item *EditVoteItemPayload) error {
 
 	result, err := p.db.Exec(`
 	UPDATE vote 
-	SET item_name=$1, item_description=$2, vote_count=$3, updated_at=NOW() 
-	WHERE vid=$4;
+	SET item_name=$1, item_description=$2, updated_at=NOW() 
+	WHERE uid=$3 
+	AND vid=$4;
 	`, item.Name,
 		item.Description,
-		item.VoteCount,
+		uid,
 		item.ID,
 	)
 

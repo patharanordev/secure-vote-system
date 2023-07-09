@@ -1,6 +1,6 @@
 "use client"
 
-import { VoteListPayload, VoteItemProps } from "#/types"
+import { VoteListPayload, VoteItemProps, VoteInfo } from "#/types"
 import VoteItem from "#/ui/vote/vote-item"
 import { Grid } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 type Props = {
     list: VoteItemProps[]
     onVoteSuccess?: Function
+    onClickEdit?: Function
     onClickDelete?: Function
 }
 
@@ -17,6 +18,12 @@ const VoteList = (props: Props) => {
     const onVoteSuccess = (vid: string) => {
         if (typeof props.onVoteSuccess === 'function') {
             props.onVoteSuccess(vid)
+        }
+    }
+
+    const onClickEdit = (voteInfo: VoteInfo) => {
+        if (typeof props.onClickEdit === 'function') {
+            props.onClickEdit(voteInfo)
         }
     }
 
@@ -57,6 +64,7 @@ const VoteList = (props: Props) => {
                 >
                     <VoteItem key={v.id} {...v} 
                         onVoteSuccess={onVoteSuccess} 
+                        onClickEdit={onClickEdit}
                         onClickDelete={onClickDelete}
                     />
                 </Grid>

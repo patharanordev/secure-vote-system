@@ -31,6 +31,7 @@ export type VotingPayload = {
 };
 
 export type VoteInfo = {
+    id: string
     itemDescription: string
     itemName: string
     voteCount?: number
@@ -40,3 +41,8 @@ export type VoteInfoItem = {
     vid: string
     info: VoteInfo
 };
+
+export enum EModifyVoteInfoMode {
+    Add = "Add",
+    Edit = "Edit"
+}

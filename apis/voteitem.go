@@ -113,7 +113,7 @@ func CreateVoteItem(c echo.Context) error {
 }
 
 func UpdateVoteItemByID(c echo.Context) error {
-	payload := new(database.VoteItemPayload)
+	payload := new(database.EditVoteItemPayload)
 	if err := c.Bind(payload); err != nil {
 		fmt.Printf("UpdateVoteItemByID error : %v\n", err.Error())
 		errMsg := "Your payload should contains 'id'."
