@@ -10,6 +10,8 @@
 - [Voting APIs](./docs/api.md)
 - [Web Application](./docs/web-app.md)
 
+![ex-usage](./docs/ex-usage.gif)
+
 ## **Usage**
 
 ### **Start services**
