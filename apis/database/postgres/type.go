@@ -11,11 +11,17 @@ type VoteItemInfoProps struct {
 }
 
 type VoteItemProps struct {
-	VID  []uint8           `json:"vid"`
+	VID  string            `json:"vid"`
 	Info VoteItemInfoProps `json:"info"`
 }
 
 type CreateVoteItemPayload struct {
+	Name        string `json:"itemName"`
+	Description string `json:"itemDescription"`
+}
+
+type EditVoteItemPayload struct {
+	ID          string `json:"id"`
 	Name        string `json:"itemName"`
 	Description string `json:"itemDescription"`
 }
@@ -57,8 +63,8 @@ type IDatabase interface {
 
 	// Vote item
 	CreateVoteItem(uid string, payload *CreateVoteItemPayload) ([]uint8, error)
-	GetVoteItemByID(uid string, payload *VoteItemIDPayload) (*VoteItemProps, error)
-	UpdateVoteItemByID(uid string, item *VoteItemPayload) error
+	GetVoteItemByID(uid string, vid string) (*VoteItemProps, error)
+	UpdateVoteItemByID(uid string, item *EditVoteItemPayload) error
 	UpVote(uid string, item *VotingPayload) error
 	DownVote(uid string, item *VotingPayload) error
 	DeleteVoteItemByID(uid string, payload *VoteItemIDPayload) error

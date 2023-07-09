@@ -84,6 +84,7 @@ func main() {
 		secGroup.DELETE("/v1/account", deleteAccount)
 
 		// CRUD vote item
+		secGroup.GET("/v1/vote-item", GetVoteItem)
 		secGroup.POST("/v1/vote-item", AddVoteItem)
 		secGroup.PATCH("/v1/vote-item", UpdateVoteItem)
 		secGroup.DELETE("/v1/vote-item", ClearVoteItem)

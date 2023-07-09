@@ -12,7 +12,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"username\": \"PatharaNor1\",\n    \"password\": \"1234567890\",\n    \"isAdmin\": false\n}",
+					"raw": "{\n    \"username\": \"PatharaAdmin\",\n    \"password\": \"1234567890\",\n    \"isAdmin\": true\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -103,7 +103,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"username\": \"PatharaNor1\",\n    \"password\": \"1234567890\"\n}",
+					"raw": "{\n    \"username\": \"PatharaNor\",\n    \"password\": \"1234567890\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -748,6 +748,110 @@
 			]
 		},
 		{
+			"name": "Get vote by ID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{test_token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9323/api/v1/vote-item?id=9a18b8c0-53d7-41a7-95ab-a0db8ff62d16",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9323",
+					"path": [
+						"api",
+						"v1",
+						"vote-item"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "9a18b8c0-53d7-41a7-95ab-a0db8ff62d16"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get vote by ID",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{test_token}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"9a18b8c0-53d7-41a7-95ab-a0db8ff62d16\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9323/api/v1/vote-item",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9323",
+							"path": [
+								"api",
+								"v1",
+								"vote-item"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Server",
+							"value": "PatharaNor"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 08 Jul 2023 15:11:24 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "188"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 201,\n    \"data\": {\n        \"info\": {\n            \"itemDescription\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n            \"itemName\": \"item 2\",\n            \"voteCount\": 0\n        },\n        \"vid\": \"OWExOGI4YzAtNTNkNy00MWE3LTk1YWItYTBkYjhmZjYyZDE2\"\n    },\n    \"error\": null\n}"
+				}
+			]
+		},
+		{
 			"name": "Clear vote list",
 			"request": {
 				"method": "DELETE",
@@ -772,7 +876,106 @@
 					]
 				}
 			},
-			"response": []
+			"response": [
+				{
+					"name": "You have not permission",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{test_token}}",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:9323/api/v1/votes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9323",
+							"path": [
+								"api",
+								"v1",
+								"votes"
+							]
+						}
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Server",
+							"value": "PatharaNor"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 09 Jul 2023 07:55:13 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "78"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 403,\n    \"data\": null,\n    \"error\": \"Your role cannot access to the resource.\"\n}"
+				},
+				{
+					"name": "You are admin",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{test_token}}",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:9323/api/v1/votes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9323",
+							"path": [
+								"api",
+								"v1",
+								"votes"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=UTF-8"
+						},
+						{
+							"key": "Server",
+							"value": "PatharaNor"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 09 Jul 2023 07:55:51 GMT"
+						},
+						{
+							"key": "Content-Length",
+							"value": "59"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"data\": \"Vote list is cleared.\",\n    \"error\": null\n}"
+				}
+			]
 		},
 		{
 			"name": "Update account",

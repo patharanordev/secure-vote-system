@@ -10,6 +10,8 @@
 - [Voting APIs](./docs/api.md)
 - [Web Application](./docs/web-app.md)
 
+![ex-usage](./docs/ex-usage.gif)
+
 ## **Usage**
 
 ### **Start services**
@@ -32,6 +34,21 @@ Let's :
 - Adding vote item — this part please using `curl` command to add the item, please refer to calling step of my [APIs](./docs/api.md).
 
 ![dashboard](./assets/dashboard.png)
+
+> ---
+> Admin role:
+> - To generate admin account, please run `curl` command below :
+>
+> ```sh
+> curl --location 'http://localhost:9323/signup' \
+> --header 'Content-Type: application/json' \
+> --data '{
+>     "username": "PatharaNor",
+>     "password": "1234567890",
+>     "isAdmin": true
+> }'
+> ```
+> ---
 
 ### **Calling APIs**
 

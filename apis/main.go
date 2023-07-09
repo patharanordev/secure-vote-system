@@ -41,6 +41,7 @@ func main() {
 	e.GET("/health", healthcheck)
 
 	// Vote item
+	e.GET("/vote-item", GetVoteItem)
 	e.POST("/vote-item", CreateVoteItem)
 	e.PATCH("/vote-item", UpdateVoteItemByID)
 	e.DELETE("/vote-item", DeleteVoteItemByID)

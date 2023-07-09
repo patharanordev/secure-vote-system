@@ -1,4 +1,4 @@
-import { RegisterForm } from "./form";
+import { RegisterForm } from "./signup-form";
 
 export default function RegisterPage() {
   return (

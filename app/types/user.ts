@@ -5,5 +5,6 @@ export type UserProfile = {
 }
 
 export type Account = {
-    profile: UserProfile
+    profile: UserProfile,
+    onAddItem?: Function
 }

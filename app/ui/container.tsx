@@ -5,7 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
 
 type Props = {
-    children: React.ReactNode
+    children?: React.ReactNode
 }
 
 export default function MainContainer(props: Props) {
