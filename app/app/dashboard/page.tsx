@@ -1,6 +1,6 @@
 "use client"
 
-import { VoteInfo, VoteItemPayload } from "#/types";
+import { VoteInfo, VoteItemPayload, VoteListPayload } from "#/types";
 import ResponsiveAppBar from "#/ui/app-bar";
 import AddItemDialog from "#/ui/dialog/dlg-add-item";
 import VoteList from "#/ui/vote/vote-list"
@@ -14,6 +14,7 @@ const DashboardPage = () => {
   const [authStatus, setAuthStatus] = useState<string>(status)
   const [isOpenAddItem, setOpenAddItem] = useState<boolean>(false)
   const [token, setToken] = useState<string|null>(null);
+  const [payload, setPayload] = useState<VoteListPayload|null>(null);
 
   const createItem = async (payload: VoteInfo) => {
     const res: VoteItemPayload = await fetch('/api/vote-item', {
@@ -30,23 +31,39 @@ const DashboardPage = () => {
     return res.error
   }
 
+  const load = async (token: string) => {
+    const payload: VoteListPayload = await fetch('/api/votes', {
+        method: "GET",
+        headers: { "Authorization": `Bearer ${token}` }
+    }).then((res) => res.json());
+
+    // console.log('VoteList session:', token);
+    console.log('VoteList payload:', payload);
+    setPayload(payload);
+}
+
   const onAddItem = () => {
     console.log('dashboard page, onAddItem :', true)
     setOpenAddItem(true)
   }
 
-  const onSaveVoteInfo = (data: VoteInfo) => {
+  const onSaveVoteInfo = async (data: VoteInfo) => {
     console.log('Vote info:', data)
-    const isError = createItem(data);
+    const isError = await createItem(data);
 
     if (!isError) {
       setOpenAddItem(false)
+      load(token ?? "")
     }
   }
 
   const onCancelVoteInfo = (data: VoteInfo) => {
     console.log('Vote info:', data)
     setOpenAddItem(false)
+  }
+
+  const onVoteSuccess = (id: string) => {
+    load(token ?? "")
   }
 
   useEffect(() => {
@@ -61,6 +78,7 @@ const DashboardPage = () => {
   useEffect(() => {
     if (session?.accessToken) {
         setToken(session.accessToken)
+        load(session.accessToken ?? "")
     }
   }, [session])
 
@@ -76,7 +94,10 @@ const DashboardPage = () => {
             alignItems: "center",
           }}
         >
-          <VoteList />
+          <VoteList 
+            list={ payload?.data ?? [] } 
+            onVoteSuccess={onVoteSuccess}
+          />
         </div>
         <AddItemDialog 
           isOpen={isOpenAddItem}

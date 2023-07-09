@@ -47,6 +47,10 @@ export default function VoteItem(props: VoteItemProps) {
         console.log('Vote item by id response:', payload);
 
         setVoteCount(payload?.data?.info?.voteCount ?? 0);
+
+        if (typeof props.onVoteSuccess === 'function') {
+            props.onVoteSuccess(id)
+        }
     }
 
     const vote = async (payload: VotingPayload) => {

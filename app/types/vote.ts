@@ -4,6 +4,7 @@ export type VoteItemProps = {
     itemDescription: string;
     userId: string;
     voteCount: number;
+    onVoteSuccess?: Function;
 }
 
 export type VoteItemIDPayload = {

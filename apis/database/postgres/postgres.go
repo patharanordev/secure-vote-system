@@ -246,7 +246,8 @@ func (p *PGProps) GetVoteList() ([]VoteItemPayload, error) {
 
 	qStr := fmt.Sprintf(`
 		SELECT vid, uid, item_name, item_description, vote_count 
-		FROM vote
+		FROM vote 
+		ORDER BY vote_count DESC
 	`)
 
 	rows, err := p.db.Query(qStr)

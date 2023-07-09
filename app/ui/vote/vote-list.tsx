@@ -3,29 +3,27 @@
 import { VoteListPayload, VoteItemProps } from "#/types"
 import VoteItem from "#/ui/vote/vote-item"
 import { Grid } from "@mui/material";
-import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
-const VoteList = () => {
-    const { data: session } = useSession();
-    const [payload, setPayload] = useState<VoteListPayload|null>(null);
+type Props = {
+    list: VoteItemProps[]
+    onVoteSuccess?: Function
+}
 
-    const load = async (token: string) => {
-        const payload: VoteListPayload = await fetch('/api/votes', {
-            method: "GET",
-            headers: { "Authorization": `Bearer ${token}` }
-        }).then((res) => res.json());
+const VoteList = (props: Props) => {
+    const [result, setResult] = useState<VoteItemProps[]>([]);
 
-        // console.log('VoteList session:', token);
-        console.log('VoteList payload:', payload);
-        setPayload(payload);
+    const onVoteSuccess = (vid: string) => {
+        if (typeof props.onVoteSuccess === 'function') {
+            props.onVoteSuccess(vid)
+        }
     }
 
     useEffect(() => {
-        if (session?.accessToken) {
-            load(session.accessToken)
+        if (props.list && props.list.length > 0) {
+            setResult(props.list)
         }
-    }, [session])
+    }, [props.list])
 
     return (
         <Grid container sx={(theme) => ({
@@ -41,7 +39,7 @@ const VoteList = () => {
                 padding: 2
             }
         })}>
-            {payload?.data?.map((v: VoteItemProps, i: number) => (
+            {result?.map((v: VoteItemProps, i: number) => (
                 <Grid item key={`grid-${v.id}`} xs={12} sm={6} md={4}
                     sx={(theme) => ({
                         padding: 1,
@@ -50,7 +48,7 @@ const VoteList = () => {
                         }
                     })}
                 >
-                    <VoteItem key={v.id} {...v} />
+                    <VoteItem key={v.id} {...v} onVoteSuccess={onVoteSuccess} />
                 </Grid>
             ))}
         </Grid>
