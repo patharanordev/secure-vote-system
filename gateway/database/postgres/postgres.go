@@ -60,15 +60,13 @@ func (p *PGProps) GetAccount(usr string, pwd string) (*AccountProps, error) {
 
 	var account AccountProps
 
-	qStr := fmt.Sprintf(`
+	rows, err := p.db.Query(`
 		SELECT uid, username, password, is_admin 
 		FROM user_info 
-		WHERE username = '%s' 
-		AND password = crypt('%s', password)
-		`, usr, pwd,
-	)
-
-	rows, err := p.db.Query(qStr)
+		WHERE username = $1 
+		AND password = crypt($2, password)
+		`, usr, pwd)
+	fmt.Printf(" - GetAccount error : %v\n", err)
 	if err != nil {
 		return nil, err
 	}
@@ -99,12 +97,10 @@ func (p *PGProps) GetAccount(usr string, pwd string) (*AccountProps, error) {
 
 func (p *PGProps) GetAccountByID(uid string) (*AccountProps, error) {
 
-	qStr := fmt.Sprintf(`
+	rows, err := p.db.Query(`
 		SELECT uid, username, password, is_admin 
 		FROM user_info 
-		WHERE uid = '%s'`, uid)
-
-	rows, err := p.db.Query(qStr)
+		WHERE uid = $1`, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -137,15 +133,17 @@ func (p *PGProps) GetAccountByID(uid string) (*AccountProps, error) {
 func (p *PGProps) UpdateAccount(uid string, usr string, isAdmin bool) error {
 
 	result, err := p.db.Exec(`
-	UPDATE user_info 
-	SET username=$1, is_admin=$2, updated_at=NOW() 
-	WHERE uid=$3
-	`, usr, isAdmin, uid)
+		UPDATE user_info 
+		SET username=$1, is_admin=$2, updated_at=NOW() 
+		WHERE uid=$3 
+		RETURNING uid
+		`, usr, isAdmin, uid,
+	)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("update result: %v\n", result)
+	fmt.Printf("update result affected: %v\n", result)
 
 	return nil
 }
