@@ -6,12 +6,8 @@ export default async function LoginLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="">
-      <body className="">
         <MainContainer>
           {children}
         </MainContainer>
-      </body>
-    </html>
   )
 }

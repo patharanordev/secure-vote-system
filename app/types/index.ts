@@ -1,3 +1,3 @@
-export * from "./user";
+export type * from "./user";
+export type * from "./vote";
 export * from "./menu";
-export * from "./vote";

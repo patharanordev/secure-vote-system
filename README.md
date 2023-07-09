@@ -33,6 +33,21 @@ Let's :
 
 ![dashboard](./assets/dashboard.png)
 
+> ---
+> Admin role:
+> - To generate admin account, please run `curl` command below :
+>
+> ```sh
+> curl --location 'http://localhost:9323/signup' \
+> --header 'Content-Type: application/json' \
+> --data '{
+>     "username": "PatharaNor",
+>     "password": "1234567890",
+>     "isAdmin": true
+> }'
+> ```
+> ---
+
 ### **Calling APIs**
 
 > ---
